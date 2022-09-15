@@ -13,7 +13,7 @@
             <v-toolbar-title>Location</v-toolbar-title>
             <v-autocomplete
               v-model="select"
-              :loading="loading"
+              @change="hideShowMarkers()"
               :items="items"
               item-text="name"
               item-value="location"
@@ -25,6 +25,9 @@
               label="Enter a city"
               solo-inverted
             >
+              <template v-slot:selection="data">
+                {{data.item.name}}, {{data.item.adminCode}}
+              </template>
               <template v-slot:item="data">
                   {{ data.item.name }}, {{ data.item.adminCode }}
               </template>
@@ -53,6 +56,7 @@
                tick-size="4"
                 max="500"
                 min="0"
+                @input="hideShowMarkers"
               ></v-slider>
           </v-row>
         </v-col>
@@ -113,18 +117,6 @@
       }
     },
     methods: {
-      keywordMatches(paddleObj,keyword) {
-
-        if (
-          paddleObj.name.toLowerCase().indexOf(keyword) > -1 ||
-          paddleObj.tags.map(tag => tag.toLowerCase())
-                        .includes(keyword)
-        ) {
-          return true;
-        } else {
-          return false;
-        }
-      },
       hideShowMarkers() {
         let filteredPaddleIds = this.filteredPaddles.map((p) => p.id);
         this.mainMap.getMapMarkers().forEach((m) => {
@@ -134,22 +126,57 @@
             m.setVisible(false);
           }
         });
+      },
+      calcCrow(coords1, coords2)  {
+        //This function takes in latitude and longitude of two locations
+        // and returns the distance between them as the crow flies (in meters)
+        // var R = 6.371; // km
+        let R = 6371000;
+        let dLat = this.toRad(coords2.lat-coords1.lat);
+        let dLon = this.toRad(coords2.lng-coords1.lng);
+        let lat1 = this.toRad(coords1.lat);
+        let lat2 = this.toRad(coords2.lat);
+
+        let a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+          Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(lat1) * Math.cos(lat2);
+        let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        let d = R * c;
+        return d;
+      },
+      toRad(Value) {
+        return Value * Math.PI / 180;
+      },
+      paddleWithinSearchRadius(searchCoords,resultsWithin,paddleCoords) {
+        let distanceInMeters = this.calcCrow(searchCoords,paddleCoords);
+        let distanceInMiles = distanceInMeters/1609.344;
+        if ( distanceInMiles < resultsWithin ) {
+          return true;
+        } else {
+          return false;
+        }
       }
     },
     computed: {
       filteredPaddles() {
-        if (!this.select && !this.keyword) {
+
+        let filteredPaddles = [];
+
+        if (!this.select) {
           return this.paddles;
         }
 
-        let keywordLwr = this.keyword.toLowerCase().trim();
-        let filteredPaddles = this.paddles.filter((paddle) => {
+        let { latitude, longitude } = this.select;
+        const searchCoordinates = {lat: latitude.toFixed(1), lng: longitude.toFixed(1)};
+        const resultsWithin = this.resultsWithinDistance;
 
-          if (
-            ( !this.select && this.keywordMatches(paddle,keywordLwr) ) ||
-            ( this.select === paddle.location.state && this.keywordMatches(paddle,keywordLwr) ) ||
-            ( this.select === paddle.location.state && !this.keyword )
-          ) {
+        filteredPaddles = this.paddles.filter((paddle) => {
+          let {lat, lng} = paddle.location.coordinates;
+          const paddleCoordinates = {lat: lat.toFixed(1), lng: lng.toFixed(1)};
+          if(this.paddleWithinSearchRadius(
+            searchCoordinates,
+            resultsWithin,
+            paddleCoordinates
+          )) {
             return true;
           } else {
             return false;
