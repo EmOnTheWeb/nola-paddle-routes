@@ -1,5 +1,12 @@
 <template>
   <v-app id="inspire">
+    <v-overlay :value="overlay" z-index="99999" light="true">
+      <v-progress-circular
+         indeterminate
+         size="64"
+       ></v-progress-circular>
+       <div class="overlay-text">Getting your location</div>
+    </v-overlay>
     <v-app-bar
       app
       color="white"
@@ -35,6 +42,7 @@
             <v-btn
               outlined
               color="primary"
+              @click="useCurrentLocation()"
             >use my location
               <v-icon
                 right
@@ -154,6 +162,46 @@
         } else {
           return false;
         }
+      },
+      getAndSetClosestCity(locationCoords) {
+        let closestDistance = null;
+        let closestTown;
+        for(let i = 0; i < LouisianaTowns.length; i++) {
+          let {latitude, longitude} = LouisianaTowns[i].location;
+          let distanceInMeters = this.calcCrow(locationCoords,{lat: latitude,lng:longitude});
+          if (distanceInMeters < closestDistance || closestDistance === null) {
+            closestDistance = distanceInMeters;
+            closestTown = LouisianaTowns[i];
+          }
+        }
+        this.select = closestTown.location;
+      },
+      useCurrentLocation() {
+
+        this.overlay = true;
+
+        const options = {
+          enableHighAccuracy: false,
+          timeout: 5000,
+          maximumAge: 0
+        };
+
+        const success = (pos) => {
+          const coords = pos.coords;
+
+          let {latitude, longitude} = coords;
+          let adjustedCoords = { lat:latitude, lng:longitude};
+          this.overlay = false;
+          this.getAndSetClosestCity(adjustedCoords);
+          this.mainMap.centerOnCurrentLocation(adjustedCoords);
+        }
+
+        const error = (err) => {
+          this.overlay = false;
+          console.warn(`ERROR(${err.code}): ${err.message}`);
+        }
+
+        navigator.geolocation.getCurrentPosition(success, error, options);
       }
     },
     computed: {
@@ -187,6 +235,7 @@
       }
     },
     data: () => ({
+      overlay: false,
       resultsWithinDistance: 100,
       mainMap: {},
       paddles: [
@@ -263,5 +312,12 @@
   .v-input__slider /deep/ .v-messages {
     display:none;
   }
-
+  .v-overlay /deep/ .v-overlay__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .overlay-text {
+    margin-top:10px;
+  }
 </style>

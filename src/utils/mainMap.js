@@ -43,6 +43,11 @@ export class MainMap {
     });
   }
 
+  centerOnCurrentLocation(locationCoords) {
+    const center = new google.maps.LatLng(locationCoords.lat, locationCoords.lng);
+    this.map.panTo(center);
+  }
+
   addMapMarkers(paddles) {
     // Add the markers to the map
     this.markers = paddles.map((paddle) => {
@@ -59,6 +64,7 @@ export class MainMap {
         console.log(i);
       });
     });
+
   }
 
   getMapMarkers() {
