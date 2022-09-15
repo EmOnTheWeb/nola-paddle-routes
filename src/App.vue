@@ -6,40 +6,39 @@
       flat
     >
       <v-container fluid class="pa-0 fill-height">
-        <v-row>
-          <v-col cols="2">
-          </v-col>
+        <div class="col col-2"></div>
+        <v-toolbar-title>Location</v-toolbar-title>
+        <v-autocomplete
+          v-model="select"
+          :loading="loading"
+          :items="items"
+          item-text="name"
+          item-value="location"
+          cache-items
+          class="mx-4"
+          flat
+          hide-no-data
+          hide-details
+          label="Enter a city"
+          solo-inverted
+        >
+          <template v-slot:item="data">
+              {{ data.item.name }}, {{ data.item.adminCode }}
+          </template>
+      </v-autocomplete>
 
-          <v-col>
-            <v-row>
-              <v-select
-                class="pr-0 pr-sm-2 pb-2 pb-sm-0 filter-bar__input"
-                label="State"
-                v-model="select"
-                @change="hideShowMarkers"
-                :items="items"
-                item-text="state"
-                item-value="abbr"
-                dense
-                flat
-                hide-details
-                solo-inverted
-              ></v-select>
+        <v-btn
+          outlined
+          color="primary"
+        >use my location
+          <v-icon
+            right
+            dark
+            >
+            mdi-crosshairs-gps
+          </v-icon>
+        </v-btn>
 
-              <v-text-field
-                class="pl-0 pl-sm-2 pr-0 pr-sm-2 filter-bar__input"
-                label="Keyword Search"
-                v-model="keyword"
-                @input="hideShowMarkers"
-                :append-icon="'mdi-map-marker'"
-                dense
-                flat
-                hide-details
-                solo-inverted
-              ></v-text-field>
-            </v-row>
-          </v-col>
-        </v-row>
       </v-container>
     </v-app-bar>
 
@@ -81,6 +80,7 @@
 
 <script>
   import {MainMap} from './utils/mainMap';
+  import {LouisianaTowns} from './assets/louisianaTowns.js';
 
   export default {
     async mounted() {
@@ -184,10 +184,7 @@
       ],
       select: null,
       keyword: '',
-      items: [
-        { state: 'Louisiana', abbr: 'LA' },
-        { state: 'Mississipi', abbr: 'MS' },
-      ]
+      items: LouisianaTowns
     }),
   }
 
