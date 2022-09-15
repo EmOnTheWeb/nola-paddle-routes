@@ -6,38 +6,56 @@
       flat
     >
       <v-container fluid class="pa-0 fill-height">
-        <div class="col col-2"></div>
-        <v-toolbar-title>Location</v-toolbar-title>
-        <v-autocomplete
-          v-model="select"
-          :loading="loading"
-          :items="items"
-          item-text="name"
-          item-value="location"
-          cache-items
-          class="mx-4"
-          flat
-          hide-no-data
-          hide-details
-          label="Enter a city"
-          solo-inverted
-        >
-          <template v-slot:item="data">
-              {{ data.item.name }}, {{ data.item.adminCode }}
-          </template>
-      </v-autocomplete>
-
-        <v-btn
-          outlined
-          color="primary"
-        >use my location
-          <v-icon
-            right
-            dark
+        <v-col cols="2">
+        </v-col>
+        <v-col cols="10">
+          <v-row class="toolbar-row">
+            <v-toolbar-title>Location</v-toolbar-title>
+            <v-autocomplete
+              v-model="select"
+              :loading="loading"
+              :items="items"
+              item-text="name"
+              item-value="location"
+              cache-items
+              class="mx-4"
+              flat
+              hide-no-data
+              hide-details
+              label="Enter a city"
+              solo-inverted
             >
-            mdi-crosshairs-gps
-          </v-icon>
-        </v-btn>
+              <template v-slot:item="data">
+                  {{ data.item.name }}, {{ data.item.adminCode }}
+              </template>
+            </v-autocomplete>
+            <v-btn
+              outlined
+              color="primary"
+            >use my location
+              <v-icon
+                right
+                dark
+                >
+                mdi-crosshairs-gps
+              </v-icon>
+            </v-btn>
+          </v-row>
+          <v-row class="toolbar-row">
+              <span style="font-size:0.85rem; width:200px;">
+                Show results within <span style="font-size:1.25rem;">{{resultsWithinDistance}}</span> miles
+              </span>
+
+              <v-slider
+               v-model="resultsWithinDistance"
+               step="10"
+               ticks
+               tick-size="4"
+                max="500"
+                min="0"
+              ></v-slider>
+          </v-row>
+        </v-col>
 
       </v-container>
     </v-app-bar>
@@ -65,7 +83,7 @@
 
           <v-col>
             <v-sheet
-              height="80vh"
+              height="calc(100vh - 124px)"
               rounded="lg"
               style="position:relative; margin-left:-10px;"
             >
@@ -142,6 +160,7 @@
       }
     },
     data: () => ({
+      resultsWithinDistance: 100,
       mainMap: {},
       paddles: [
         {
@@ -193,17 +212,29 @@
 
 <style scoped>
   .v-list-item__title {
-    font-size: 0.75rem;
+    font-size: 0.85rem;
   }
   #map {
     position:absolute;
     top:0;bottom:0;right:0;left:0;
   }
-  .filter-bar__input {
-    flex-basis:50%;
-    min-width:240px;
-    .v-input__control {
-      cursor: pointer;
-    }
+  .toolbar-row {
+    align-items:center;
   }
+  .toolbar-row + .toolbar-row {
+    padding-top:8px;
+  }
+  .v-main {
+    padding-top: 100px!important;
+  }
+  .v-app-bar, /deep/ .v-toolbar__content{
+    height:100px!important;
+  }
+  .v-input__slider /deep/ .v-input__slot {
+    margin-bottom:0px;
+  }
+  .v-input__slider /deep/ .v-messages {
+    display:none;
+  }
+
 </style>
