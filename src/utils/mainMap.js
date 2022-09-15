@@ -2,8 +2,8 @@ const API_KEY = process.env.VUE_APP_API_KEY;
 const CALLBACK_NAME = 'gmapsCallback';
 
 export class MainMap {
-  constructor(mapEl) {
-    this.map = mapEl;
+  constructor() {
+    this.map = {};
     this.initialized = !!window.google;
     this.resolveInitPromise;
     this.rejectInitPromise;
@@ -59,5 +59,9 @@ export class MainMap {
         console.log(i);
       });
     });
+  }
+
+  getMapMarkers() {
+    return this.markers;
   }
 }

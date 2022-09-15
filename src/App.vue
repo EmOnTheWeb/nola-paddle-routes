@@ -86,9 +86,9 @@
     async mounted() {
       try {
 
-        const mainMap = new MainMap();
-        await mainMap.initMap();
-        mainMap.addMapMarkers(this.paddles);
+        this.mainMap = new MainMap();
+        await this.mainMap.initMap();
+        this.mainMap.addMapMarkers(this.paddles);
 
       } catch (error) {
         console.error(error);
@@ -109,7 +109,7 @@
       },
       hideShowMarkers() {
         let filteredPaddleIds = this.filteredPaddles.map((p) => p.id);
-        this.markers.forEach((m) => {
+        this.mainMap.getMapMarkers().forEach((m) => {
           if (filteredPaddleIds.includes(m.get('paddle_id'))) {
             m.setVisible(true);
           } else {
@@ -142,9 +142,7 @@
       }
     },
     data: () => ({
-      googleObj: null,
-      markers: [],
-      map: null,
+      mainMap: {},
       paddles: [
         {
           id: 1,
