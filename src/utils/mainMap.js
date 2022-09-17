@@ -48,7 +48,7 @@ export class MainMap {
     this.map.panTo(center);
   }
 
-  addMapMarkers(paddles) {
+  addMapMarkers(paddles, clickCallback) {
     // Add the markers to the map
     this.markers = paddles.map((paddle) => {
       return new this.mapObj.maps.Marker({
@@ -61,7 +61,7 @@ export class MainMap {
     // Add event listeners to the markers
     this.markers.map((marker, i) => {
       marker.addListener('click', () => {
-        console.log(i);
+        clickCallback(marker.get('paddle_id'));
       });
     });
 

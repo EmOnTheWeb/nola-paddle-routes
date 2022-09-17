@@ -1,12 +1,11 @@
 <template>
   <v-app id="inspire">
-    <v-overlay :value="overlay" z-index="99999" light="true">
-      <v-progress-circular
-         indeterminate
-         size="64"
-       ></v-progress-circular>
-       <div class="overlay-text">Getting your location</div>
-    </v-overlay>
+    <!-- individual view -->
+    <individual-view
+      @close="individualViewIsShowing=false"
+      :initialData="clickedPaddle"
+      :show="individualViewIsShowing">
+    </individual-view>
     <v-app-bar
       app
       color="white"
@@ -43,13 +42,22 @@
               outlined
               color="primary"
               @click="useCurrentLocation()"
-            >use my location
+            >
+              <span>use my location</span>
               <v-icon
                 right
                 dark
+                v-show="!isGettingLocation"
                 >
                 mdi-crosshairs-gps
               </v-icon>
+              <v-progress-circular
+                 v-show="isGettingLocation"
+                 indeterminate
+                 size="18"
+                 width="2"
+                 style="margin-left:8px;"
+               ></v-progress-circular>
             </v-btn>
           </v-row>
           <v-row class="toolbar-row">
@@ -82,6 +90,7 @@
                   v-for="(paddle, index) in filteredPaddles"
                   :key="index"
                   link
+                  @click="openIndividualView(paddle)"
                 >
                   <v-list-item-content>
                     <v-list-item-title>
@@ -111,14 +120,24 @@
 <script>
   import {MainMap} from './utils/mainMap';
   import {LouisianaTowns} from './assets/louisianaTowns.js';
+  import IndividualView from './components/IndividualView.vue'
 
   export default {
+    components: {
+      IndividualView,
+    },
     async mounted() {
       try {
 
         this.mainMap = new MainMap();
         await this.mainMap.initMap();
-        this.mainMap.addMapMarkers(this.paddles);
+
+        const callback = (paddleId) => {
+          this.clickedPaddle = this.paddles.find((p) => p.id == paddleId);
+          this.individualViewIsShowing = true;
+        }
+        
+        this.mainMap.addMapMarkers(this.paddles,callback);
 
       } catch (error) {
         console.error(error);
@@ -178,7 +197,7 @@
       },
       useCurrentLocation() {
 
-        this.overlay = true;
+        this.isGettingLocation = true;
 
         const options = {
           enableHighAccuracy: false,
@@ -191,18 +210,22 @@
 
           let {latitude, longitude} = coords;
           let adjustedCoords = { lat:latitude, lng:longitude};
-          this.overlay = false;
+          this.isGettingLocation = false;
           this.getAndSetClosestCity(adjustedCoords);
           this.mainMap.centerOnCurrentLocation(adjustedCoords);
         }
 
         const error = (err) => {
-          this.overlay = false;
+          this.isGettingLocation = false;
           console.warn(`ERROR(${err.code}): ${err.message}`);
         }
 
         navigator.geolocation.getCurrentPosition(success, error, options);
-      }
+      },
+      openIndividualView(paddleObj) {
+        this.individualViewIsShowing = true;
+        this.clickedPaddle = paddleObj;
+      },
     },
     computed: {
       filteredPaddles() {
@@ -235,7 +258,9 @@
       }
     },
     data: () => ({
-      overlay: false,
+      individualViewIsShowing: false,
+      clickedPaddle: {},
+      isGettingLocation: false,
       resultsWithinDistance: 100,
       mainMap: {},
       paddles: [
@@ -311,13 +336,5 @@
   }
   .v-input__slider /deep/ .v-messages {
     display:none;
-  }
-  .v-overlay /deep/ .v-overlay__content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  .overlay-text {
-    margin-top:10px;
   }
 </style>
