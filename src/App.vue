@@ -146,15 +146,7 @@
     methods: {
       hideShowMarkers() {
         let filteredPaddleIds = this.filteredPaddles.map((p) => p.id);
-        this.mainMap.getMapMarkers().forEach((m) => {
-          let markerElem = m.getElement();
-
-          if (filteredPaddleIds.includes(Number(markerElem.dataset.paddle_id))) {
-            markerElem.style.visibility = "visible";
-          } else {
-            markerElem.style.visibility = "hidden";
-          }
-        });
+        this.mainMap.hideShowMarkers(filteredPaddleIds);
       },
       calcCrow(coords1, coords2)  {
         //This function takes in latitude and longitude of two locations
@@ -178,7 +170,7 @@
       paddleWithinSearchRadius(searchCoords,resultsWithin,paddleCoords) {
         let distanceInMeters = this.calcCrow(searchCoords,paddleCoords);
         let distanceInMiles = distanceInMeters/1609.344;
-        if ( distanceInMiles < resultsWithin ) {
+        if ( distanceInMiles <= resultsWithin ) {
           return true;
         } else {
           return false;

@@ -38,8 +38,20 @@ export class MainMap {
        });
 
        markerElem.dataset.paddle_id = paddle.id;
-    
+
       return marker;
+    });
+  }
+
+  hideShowMarkers(filteredPaddleIds) {
+    this.markers.forEach((m) => {
+      let markerElem = m.getElement();
+
+      if (filteredPaddleIds.includes(Number(markerElem.dataset.paddle_id))) {
+        markerElem.style.visibility = "visible";
+      } else {
+        markerElem.style.visibility = "hidden";
+      }
     });
   }
 
