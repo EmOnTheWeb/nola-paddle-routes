@@ -18,7 +18,25 @@
           </v-icon>
 
       </v-card-title>
-
+      <v-container>
+        <v-row>
+          <v-col cols="9">
+            <v-card-subtitle>Description</v-card-subtitle>
+            <v-card-text>{{paddle.description}}</v-card-text>
+            <v-card-subtitle>Difficulty</v-card-subtitle>
+            <v-card-text>{{paddle.difficulty}}</v-card-text>
+            <v-card-subtitle>Distance</v-card-subtitle>
+            <v-card-text>{{paddle.distance}}</v-card-text>
+          </v-col>
+          <v-col cols="3">
+            <v-img
+              max-height="250"
+              max-width="350"
+              src="staticImgPath"
+            ></v-img>
+          </v-col>
+        </v-row>
+      </v-container>
     </v-card>
   </v-dialog>
 </template>
@@ -35,57 +53,24 @@
         this.$emit("close");
       }
     },
+    computed: {
+      staticImgPath() {
+        return "./assets/" + this.paddle.imgSrc;
+      }
+    },
     data: () => ({
-      ecosystem: [
-        {
-          text: 'vuetify-loader',
-          href: 'https://github.com/vuetifyjs/vuetify-loader',
-        },
-        {
-          text: 'github',
-          href: 'https://github.com/vuetifyjs/vuetify',
-        },
-        {
-          text: 'awesome-vuetify',
-          href: 'https://github.com/vuetifyjs/awesome-vuetify',
-        },
-      ],
-      importantLinks: [
-        {
-          text: 'Documentation',
-          href: 'https://vuetifyjs.com',
-        },
-        {
-          text: 'Chat',
-          href: 'https://community.vuetifyjs.com',
-        },
-        {
-          text: 'Made with Vuetify',
-          href: 'https://madewithvuejs.com/vuetify',
-        },
-        {
-          text: 'Twitter',
-          href: 'https://twitter.com/vuetifyjs',
-        },
-        {
-          text: 'Articles',
-          href: 'https://medium.com/vuetify',
-        },
-      ],
-      whatsNext: [
-        {
-          text: 'Explore components',
-          href: 'https://vuetifyjs.com/components/api-explorer',
-        },
-        {
-          text: 'Select a layout',
-          href: 'https://vuetifyjs.com/getting-started/pre-made-layouts',
-        },
-        {
-          text: 'Frequently Asked Questions',
-          href: 'https://vuetifyjs.com/getting-started/frequently-asked-questions',
-        },
-      ],
+      paddle: {
+        id: 2,
+        name: 'Bay St. Louis Loop',
+        description: 'Loop paddle through some marsh and the ocean.',
+        difficulty: 'Medium',
+        distance: '10 miles',
+        tags: [
+          'Louisiana',
+          'Easy'
+        ],
+        imgSrc: 'kayak_loop.jpeg'
+      },
     }),
   }
 </script>
@@ -98,6 +83,9 @@
       position:absolute;
       right:20px;
     }
+  }
+  .v-card__subtitle {
+    font-weight:bold;
   }
 
 </style>
