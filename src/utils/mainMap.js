@@ -1,70 +1,46 @@
 const API_KEY = process.env.VUE_APP_API_KEY;
-const CALLBACK_NAME = 'gmapsCallback';
 
 export class MainMap {
   constructor() {
     this.map = {};
-    this.initialized = !!window.google;
-    this.resolveInitPromise;
-    this.rejectInitPromise;
-    this.mapObj;
     this.markers = [];
-    this.initPromise = new Promise((resolve, reject) => {
-      this.resolveInitPromise = resolve;
-      this.rejectInitPromise = reject;
-    });
-  }
-
-  loadScript() {
-    if (this.initialized) return this.initPromise;
-
-    this.initialized = true;
-
-    window[CALLBACK_NAME] = () => this.resolveInitPromise(window.google);
-
-    const script = document.createElement('script');
-    script.async = true;
-    script.defer = true;
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${API_KEY}&callback=${CALLBACK_NAME}`;
-    script.onerror = this.rejectInitPromise;
-    document.querySelector('head').appendChild(script);
-
-    return this.initPromise;
-
   }
 
   async initMap() {
-    this.mapObj = await this.loadScript();
-    const mapEl = document.getElementById('map');
 
-    this.map = new this.mapObj.maps.Map(mapEl, {
-      center: {lat: 30.2988043, lng: -89.4077829},
-      zoom: 8
-    });
+    mapboxgl.accessToken = API_KEY;
+    this.map = new mapboxgl.Map({
+      container: 'map', // container ID
+      // Choose from Mapbox's core styles, or make your own style with Mapbox Studio
+      style: 'mapbox://styles/mapbox/outdoors-v11',
+      center: [-89.4077829,30.2988043], // starting position [lng, lat]
+      zoom: 8,
+      });
   }
 
   centerOnCurrentLocation(locationCoords) {
-    const center = new google.maps.LatLng(locationCoords.lat, locationCoords.lng);
-    this.map.panTo(center);
+    this.map.flyTo({
+      center:[locationCoords.lng, locationCoords.lat]
+    });
   }
 
   addMapMarkers(paddles, clickCallback) {
-    // Add the markers to the map
+
     this.markers = paddles.map((paddle) => {
-      return new this.mapObj.maps.Marker({
-        position: paddle.location.coordinates,
-        map: this.map,
-        paddle_id: paddle.id
-      });
-    });
+      const marker = new mapboxgl.Marker()
+        .setLngLat([paddle.location.coordinates.lng, paddle.location.coordinates.lat])
+        .addTo(this.map);
 
-    // Add event listeners to the markers
-    this.markers.map((marker, i) => {
-      marker.addListener('click', () => {
-        clickCallback(marker.get('paddle_id'));
-      });
-    });
+      let markerElem = marker.getElement();
 
+      markerElem.addEventListener('click', () => {
+          clickCallback(paddle.id);
+       });
+
+       markerElem.dataset.paddle_id = paddle.id;
+    
+      return marker;
+    });
   }
 
   getMapMarkers() {

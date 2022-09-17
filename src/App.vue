@@ -136,7 +136,7 @@
           this.clickedPaddle = this.paddles.find((p) => p.id == paddleId);
           this.individualViewIsShowing = true;
         }
-        
+
         this.mainMap.addMapMarkers(this.paddles,callback);
 
       } catch (error) {
@@ -147,10 +147,12 @@
       hideShowMarkers() {
         let filteredPaddleIds = this.filteredPaddles.map((p) => p.id);
         this.mainMap.getMapMarkers().forEach((m) => {
-          if (filteredPaddleIds.includes(m.get('paddle_id'))) {
-            m.setVisible(true);
+          let markerElem = m.getElement();
+
+          if (filteredPaddleIds.includes(Number(markerElem.dataset.paddle_id))) {
+            markerElem.style.visibility = "visible";
           } else {
-            m.setVisible(false);
+            markerElem.style.visibility = "hidden";
           }
         });
       },
