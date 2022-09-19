@@ -108,7 +108,7 @@
     },
     methods: {
       goBack() {
-        this.routeMapExpanded = false; 
+        this.routeMapExpanded = false;
         this.$emit('back',true);
       },
       generateAndExportGPXFile() {
@@ -150,19 +150,7 @@
       },
       expandRouteMap() {
         this.routeMapExpanded = true;
-
-        if (!this.mapIsLoaded) {
-          this.$nextTick(() => {
-            this.initMapAndDrawRoute();
-          });
-
-          this.mapIsLoaded = true;
-        }
       },
-      async initMapAndDrawRoute() {
-        this.routeMap = new MainMap();
-        await this.routeMap.initMap();
-      }
     },
     computed: {
       drivingDirectionsHref() {
