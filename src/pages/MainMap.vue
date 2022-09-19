@@ -299,6 +299,12 @@
 </script>
 
 <style scoped>
+  .v-list-item {
+    min-height:0px;
+  }
+  .v-list-item__content {
+    padding-top:2.5px; padding-bottom:2.5px; 
+  }
   .v-list-item__title {
     font-size: 0.85rem;
   }
