@@ -10,7 +10,7 @@ Vue.config.productionTip = false
 
 const routes = [
   { path: '/', component: MainMap },
-  { path: '/single-paddle-view/:name', component: IndividualView },
+  { path: '/single-paddle-view/:id/:name', component: IndividualView },
 ]
 
 const router = new VueRouter({

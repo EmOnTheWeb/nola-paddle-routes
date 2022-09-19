@@ -1,11 +1,5 @@
 <template>
-  <v-app id="inspire">
-    <!-- individual view -->
-    <individual-view
-      @close="individualViewIsShowing=false"
-      :initialData="clickedPaddle"
-      :show="individualViewIsShowing">
-    </individual-view>
+  <div>
     <v-app-bar
       app
       color="white"
@@ -90,7 +84,8 @@
                   v-for="(paddle, index) in filteredPaddles"
                   :key="index"
                   link
-                  @click="openIndividualView(paddle)"
+                  min-height="0"
+                  @click="goToIndividualView(paddle)"
                 >
                   <v-list-item-content>
                     <v-list-item-title>
@@ -114,7 +109,7 @@
         </v-row>
       </v-container>
     </v-main>
-  </v-app>
+  </div>
 </template>
 
 <script>
@@ -133,8 +128,8 @@
         await this.mainMap.initMap();
 
         const callback = (paddleId) => {
-          this.clickedPaddle = this.paddles.find((p) => p.id == paddleId);
-          this.individualViewIsShowing = true;
+          let clickedPaddle = this.paddles.find((p) => p.id == paddleId);
+          this.goToIndividualView(clickedPaddle);
         }
 
         this.mainMap.addMapMarkers(this.paddles,callback);
@@ -216,9 +211,9 @@
 
         navigator.geolocation.getCurrentPosition(success, error, options);
       },
-      openIndividualView(paddleObj) {
-        this.individualViewIsShowing = true;
-        this.clickedPaddle = paddleObj;
+      goToIndividualView(paddleObj) {
+        let slug = paddleObj.name.replace(/\s+/g, '-').replace(/\./g,'').toLowerCase();
+        this.$router.push('/single-paddle-view/' + paddleObj.id + '/' + slug);
       },
     },
     computed: {
@@ -252,8 +247,6 @@
       }
     },
     data: () => ({
-      individualViewIsShowing: false,
-      clickedPaddle: {},
       isGettingLocation: false,
       resultsWithinDistance: 100,
       mainMap: {},
