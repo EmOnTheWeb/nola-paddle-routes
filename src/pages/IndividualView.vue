@@ -39,12 +39,15 @@
           <p>{{paddle.difficulty}}</p>
           <h3>Distance</h3>
           <p>{{paddle.distance}}</p>
-          <v-chip
-            v-for="(tag,index) in paddle.tags"
-            :key="index"
-          >
-            {{tag}}
-          </v-chip>
+          <p><a target="_blank" :href="drivingDirectionsHref">Driving Directions</a></p>
+          <div class="tags">
+            <v-chip
+              v-for="(tag,index) in paddle.tags"
+              :key="index"
+            >
+              {{tag}}
+            </v-chip>
+          </div>
         </v-col>
         <v-col cols="4" v-show="!routeMapExpanded">
           <div class="image-container">
@@ -69,6 +72,14 @@
             mdi-printer
             </v-icon>
           </a>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col cols=12>
+          <v-tabs>
+            <v-tab>Comments</v-tab>
+            <v-tab>Photos</v-tab>
+          </v-tabs>
         </v-col>
       </v-row>
     </v-container>
@@ -145,7 +156,9 @@
       }
     },
     computed: {
-
+      drivingDirectionsHref() {
+        return 'https://www.google.com/maps/dir/?api=1&destination=' + this.paddle.launch.coordinates.lat + ',' + this.paddle.launch.coordinates.long;
+      }
     },
     data: () => ({
       routeMap: null,
@@ -157,6 +170,10 @@
         description: 'Peaceful paddle down a winding river free from motorized boats. But then you encounter progressively worse blowdowns until its time to turn back, unless you want to do battle with branches',
         difficulty: 'Medium',
         distance: '6.5 miles',
+        launch: {
+          notes:'Put in from the grass to the side of the concrete ramp',
+          coordinates:{ long:-90.10481683, lat:30.45592972 }
+        },
         tags: [
           'Louisiana',
           'Medium Difficulty'
@@ -226,5 +243,8 @@
   }
   .map-container .btn-container button {
       margin-right:5px;
+  }
+  div.tags {
+    margin-top:25px; 
   }
 </style>
