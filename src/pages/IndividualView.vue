@@ -10,7 +10,8 @@
             mdi-file-export-outline
             </v-icon>
           </v-btn>
-          <v-btn color="primary" depressed>
+          <v-btn color="primary" depressed
+            @click="showRouteMapPrintDialog()">
             Print Route Map
             <v-icon dark>
             mdi-printer
@@ -63,7 +64,7 @@
             mdi-file-export-outline
             </v-icon>
           </a>
-          <a class="small-map">Print Route Map
+          <a class="small-map" @click="showRouteMapPrintDialog()">Print Route Map
             <v-icon color="primary">
             mdi-printer
             </v-icon>
@@ -109,6 +110,20 @@
         document.body.appendChild(link);
         link.click();
         link.remove();
+      },
+      showRouteMapPrintDialog() {
+        let popup;
+        function closePrint () {
+            if ( popup ) {
+                popup.close();
+            }
+        }
+
+        popup = window.open( '/img/route.5d4a6144.png' );
+        popup.onbeforeunload = closePrint;
+        popup.onafterprint = closePrint;
+        popup.focus(); // Required for IE
+        popup.print();
       },
       collapseRouteMap() {
         this.routeMapExpanded = false;
