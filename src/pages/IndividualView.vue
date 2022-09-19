@@ -30,7 +30,12 @@
         ></v-img>
       </div>
 
-      <v-toolbar flat><h2>{{paddle.name}}</h2></v-toolbar>
+      <v-toolbar flat>
+        <v-btn @click="goBack()" class="btn-back" depressed text-color="secondary">
+          <v-icon dark left>mdi-arrow-left</v-icon>Back to Map
+        </v-btn>
+        <h2>{{paddle.name}}</h2>
+      </v-toolbar>
       <v-row>
         <v-col cols="8" :style="routeMapExpanded ? 'width:100%!important' : ''">
           <h3>Description</h3>
@@ -102,6 +107,9 @@
 
     },
     methods: {
+      goBack() {
+        this.$router.push('/'); 
+      },
       generateAndExportGPXFile() {
 
         let result = '<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="runtracker"><metadata/><trk><name></name><desc></desc>';
@@ -245,6 +253,12 @@
       margin-right:5px;
   }
   div.tags {
-    margin-top:25px; 
+    margin-top:25px;
+  }
+  .btn-back {
+    position:absolute;
+    left:5px;
+    top: 50%;
+    transform: translate(0,-50%);
   }
 </style>
