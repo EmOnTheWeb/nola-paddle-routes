@@ -7,7 +7,6 @@ export class MainMap {
   }
 
   async initMap() {
-
     mapboxgl.accessToken = API_KEY;
     this.map = new mapboxgl.Map({
       container: 'map', // container ID

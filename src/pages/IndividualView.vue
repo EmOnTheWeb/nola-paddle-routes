@@ -108,7 +108,8 @@
     },
     methods: {
       goBack() {
-        this.$router.push('/'); 
+        this.routeMapExpanded = false; 
+        this.$emit('back',true);
       },
       generateAndExportGPXFile() {
 

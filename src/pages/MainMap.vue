@@ -1,5 +1,8 @@
 <template>
   <div>
+    <v-dialog :fullscreen="true" v-model="showIndividualView">
+      <individual-view @back="showIndividualView = false"></individual-view>
+    </v-dialog>
     <v-app-bar
       app
       color="white"
@@ -74,7 +77,7 @@
       </v-container>
     </v-app-bar>
 
-    <v-main class="grey lighten-3">
+    <v-main class="grey lighten-3 main-map">
       <v-container fluid>
         <v-row>
           <v-col cols="2">
@@ -212,8 +215,9 @@
         navigator.geolocation.getCurrentPosition(success, error, options);
       },
       goToIndividualView(paddleObj) {
-        let slug = paddleObj.name.replace(/\s+/g, '-').replace(/\./g,'').toLowerCase();
-        this.$router.push('/single-paddle-view/' + paddleObj.id + '/' + slug);
+        this.showIndividualView = true;
+        // let slug = paddleObj.name.replace(/\s+/g, '-').replace(/\./g,'').toLowerCase();
+        // this.$router.push('/single-paddle-view/' + paddleObj.id + '/' + slug);
       },
     },
     computed: {
@@ -291,7 +295,8 @@
       ],
       select: null,
       keyword: '',
-      items: LouisianaTowns
+      items: LouisianaTowns,
+      showIndividualView: false
     }),
   }
 
@@ -303,7 +308,7 @@
     min-height:0px;
   }
   .v-list-item__content {
-    padding-top:2.5px; padding-bottom:2.5px; 
+    padding-top:2.5px; padding-bottom:2.5px;
   }
   .v-list-item__title {
     font-size: 0.85rem;
@@ -318,10 +323,10 @@
   .toolbar-row + .toolbar-row {
     padding-top:8px;
   }
-  .v-main {
+  .v-main.main-map {
     padding-top: 100px!important;
   }
-  .v-app-bar, /deep/ .v-toolbar__content{
+  .v-app-bar, .main-map /deep/ .v-toolbar__content{
     height:100px!important;
   }
   .v-input__slider /deep/ .v-input__slot {
@@ -329,5 +334,8 @@
   }
   .v-input__slider /deep/ .v-messages {
     display:none;
+  }
+  .v-dialog .v-main {
+    padding-top:0px!important;
   }
 </style>
