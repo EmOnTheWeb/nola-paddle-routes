@@ -3,21 +3,18 @@
     <v-container>
       <div class="map-container" v-show="routeMapExpanded">
         <div class="btn-container">
-          <v-btn color="primary" depressed>
-            <a>
-              Export Route
-              <v-icon dark>
-              mdi-file-export-outline
-              </v-icon>
-            </a>
+          <v-btn color="primary" depressed
+            @click="generateAndExportGPXFile()">
+            Export Route
+            <v-icon dark>
+            mdi-file-export-outline
+            </v-icon>
           </v-btn>
           <v-btn color="primary" depressed>
-            <a>
-              Print Route Map
-              <v-icon dark>
-              mdi-printer
-              </v-icon>
-            </a>
+            Print Route Map
+            <v-icon dark>
+            mdi-printer
+            </v-icon>
           </v-btn>
         </div>
         <v-icon
@@ -61,7 +58,7 @@
               mdi-arrow-expand
             </v-icon>
           </div>
-          <a class="small-map">Export Route
+          <a class="small-map" @click="generateAndExportGPXFile()">Export Route
             <v-icon color="primary">
             mdi-file-export-outline
             </v-icon>
@@ -81,6 +78,7 @@
 
   import {MainMap} from '../utils/mainMap';
   import {generateStaticMap} from '../utils/generateStaticMap';
+  import geoJson from '../dummy/track.json';
 
   export default {
     name: 'IndividualView',
@@ -89,10 +87,29 @@
       show: Boolean
     },
     mounted() {
-      generateStaticMap();
 
     },
     methods: {
+      generateAndExportGPXFile() {
+
+        let result = '<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="runtracker"><metadata/><trk><name></name><desc></desc>';
+        result += '<trkseg>';
+        let coords = geoJson.features[0].geometry.coordinates;
+        result += coords.reduce((accum,curr) => {
+          let ptTag = `<trkpt lat="${curr[1]}" lon="${curr[0]}"></trkpt>`;
+          return accum += ptTag;
+        }, '');
+        result += '</trkseg>'
+        result += '</trk></gpx>';
+
+        const url = 'data:text/json;charset=utf-8,' + result;
+        const link = document.createElement('a');
+        link.download = `${this.$route.params.name}.gpx`;
+        link.href = url;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      },
       collapseRouteMap() {
         this.routeMapExpanded = false;
       },
@@ -146,6 +163,10 @@
   a.small-map {
     display:block;
     margin:2.5px 0px;
+    font-size:14px;
+  }
+  a.small-map .v-icon {
+    font-size:20px;
   }
   @media (min-width: 1264px) {
     .container {
@@ -190,9 +211,5 @@
   }
   .map-container .btn-container button {
       margin-right:5px;
-  }
-  .map-container .btn-container button a {
-    background:transparent;
-    color:#fff; 
   }
 </style>
