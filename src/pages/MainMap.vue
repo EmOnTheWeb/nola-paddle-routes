@@ -9,11 +9,10 @@
       flat
     >
       <v-container fluid class="pa-0 fill-height">
-        <v-col cols="2">
-        </v-col>
-        <v-col cols="10">
+        <!--<v-col cols="2" class="d-none d-sm-flex">
+        </v-col>-->
+        <v-col cols="12" >
           <v-row class="toolbar-row">
-            <v-toolbar-title>Location</v-toolbar-title>
             <v-autocomplete
               v-model="select"
               @change="hideShowMarkers()"
@@ -21,12 +20,13 @@
               item-text="name"
               item-value="location"
               cache-items
-              class="mx-4"
+              class="mr-2 mb-0 mr-sm-4"
               flat
               hide-no-data
               hide-details
-              label="Enter a city"
+              label="Location"
               solo-inverted
+              min-height="38"
             >
               <template v-slot:selection="data">
                 {{data.item.name}}, {{data.item.adminCode}}
@@ -40,7 +40,7 @@
               color="primary"
               @click="useCurrentLocation()"
             >
-              <span>use my location</span>
+              <span class="d-none d-sm-inline">use my location</span>
               <v-icon
                 right
                 dark
@@ -80,8 +80,8 @@
     <v-main class="grey lighten-3 main-map">
       <v-container fluid>
         <v-row>
-          <v-col cols="2">
-            <v-sheet rounded="lg">
+          <v-col cols="2" class="d-none d-sm-block pr-0 pl-0 pt-0">
+            <v-sheet class="pt-1" style="height:100%;">
               <v-list color="transparent">
                 <v-list-item
                   v-for="(paddle, index) in filteredPaddles"
@@ -100,11 +100,11 @@
             </v-sheet>
           </v-col>
 
-          <v-col>
+          <v-col cols="12" sm="10">
             <v-sheet
               height="calc(100vh - 124px)"
               rounded="lg"
-              style="position:relative; margin-left:-10px;"
+              style="position:relative;"
             >
               <div id="map"></div>
             </v-sheet>

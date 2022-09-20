@@ -31,13 +31,13 @@
       </div>
 
       <v-toolbar flat>
-        <v-btn @click="goBack()" class="btn-back" depressed text-color="secondary">
-          <v-icon dark left>mdi-arrow-left</v-icon>Back to Map
+        <v-btn @click="goBack()" class="btn-back px-1 px-sm-4" depressed text-color="secondary" min-width="20">
+          <v-icon dark left>mdi-arrow-left</v-icon><span class="d-none d-sm-inline">Back to Map</span>
         </v-btn>
         <h2>{{paddle.name}}</h2>
       </v-toolbar>
       <v-row>
-        <v-col cols="8" :style="routeMapExpanded ? 'width:100%!important' : ''">
+        <v-col cols="12" sm="8" :style="routeMapExpanded ? 'width:100%!important' : ''">
           <h3>Description</h3>
           <p>{{paddle.description}}</p>
           <h3>Difficulty</h3>
@@ -54,14 +54,14 @@
             </v-chip>
           </div>
         </v-col>
-        <v-col cols="4" v-show="!routeMapExpanded">
+        <v-col cols="12" sm="4" v-show="!routeMapExpanded">
           <div class="image-container">
             <v-img
               :src="require(`@/dummy/${paddle.imgSrc}`)"
             ></v-img>
             <v-icon
               dark
-              class="toggle-mapsize-icon"
+              class="toggle-mapsize-icon d-none d-sm-inline"
               @click="expandRouteMap()"
               >
               mdi-arrow-expand
@@ -155,7 +155,7 @@
     computed: {
       drivingDirectionsHref() {
         return 'https://www.google.com/maps/dir/?api=1&destination=' + this.paddle.launch.coordinates.lat + ',' + this.paddle.launch.coordinates.long;
-      }
+      },
     },
     data: () => ({
       routeMap: null,
