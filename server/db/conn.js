@@ -1,46 +1,24 @@
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_NAME}:${process.env.DB_PASSWORD}@cluster0.o3atuqr.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
-client.connect(err => {
-  console.log('i connected yeah');
-  client.close();
-});
 
+let dbConnection; 
 
-//
-//[longitude, latitude, elevation]
+module.exports = {
+  connectToServer: (callback) => {
+    client.connect((err, db) => {
+      if (err || !db) {
+        return callback(err);
+      }
 
-//collection paddles
-// {
-//   // id: 1,
-//   // name: 'Bay St. Louis Loop',
-//   // start: {lat: 30.2988043,  lng: -89.4077829},
-//   // tags: [
-//   //   'Mississipi',
-//   //   'Medium',
-//   //   'Open water'
-//   // ]
-// },
+      dbConnection = db.db("paddleroutes");
+      console.log("Successfully connected to MongoDB.");
 
+      return callback();
+    });
+  },
 
-//
-
-
-
-//
-//[longitude, latitude, elevation]
-
-//collection paddles
-// {
-//   // id: 1,
-//   // name: 'Bay St. Louis Loop',
-//   // start: {lat: 30.2988043,  lng: -89.4077829},
-//   // tags: [
-//   //   'Mississipi',
-//   //   'Medium',
-//   //   'Open water'
-//   // ]
-// },
-
-
-//
+  getDb: () => {
+    return dbConnection;
+  },
+};
