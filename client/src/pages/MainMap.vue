@@ -20,13 +20,13 @@
               item-text="name"
               item-value="location"
               cache-items
-              class="mr-2 mb-0 mr-sm-4"
+              class="mr-2 mb-0 mr-sm-2"
               flat
               hide-no-data
               hide-details
               label="Location"
               solo-inverted
-              min-height="38"
+              min-height="28"
             >
               <template v-slot:selection="data">
                 {{data.item.name}}, {{data.item.adminCode}}
@@ -37,6 +37,7 @@
             </v-autocomplete>
             <v-btn
               outlined
+              small
               color="primary"
               @click="useCurrentLocation()"
             >
@@ -80,7 +81,7 @@
     <v-main class="grey lighten-3 main-map">
       <v-container fluid>
         <v-row>
-          <v-col cols="2" class="d-none d-sm-block pr-0 pl-0 pt-0">
+          <v-col cols="2" class="d-none d-sm-block pr-0 pl-0 pt-0 pb-0">
             <v-sheet class="pt-1" style="height:100%;">
               <v-list color="transparent">
                 <v-list-item
@@ -99,17 +100,18 @@
               </v-list>
             </v-sheet>
           </v-col>
-          <v-progress-circular
-             v-if="!mapMarkersAdded"
-             indeterminate
-             color="primary"
-          ></v-progress-circular>
           <v-col cols="12" sm="10">
             <v-sheet
-              height="calc(100vh - 124px)"
+              height="calc(100vh - 96px)"
               rounded="lg"
               style="position:relative;"
             >
+              <v-progress-circular
+                 v-if="!mapMarkersAdded"
+                 indeterminate
+                 color="warning"
+                 class="map-loading-spinner"
+              ></v-progress-circular>
               <div id="map"></div>
             </v-sheet>
           </v-col>
@@ -297,7 +299,7 @@
 
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
   .v-list-item {
     min-height:0px;
   }
@@ -311,25 +313,39 @@
     position:absolute;
     top:0;bottom:0;right:0;left:0;
   }
+  .v-toolbar {
+    padding-top:2px;
+  }
   .toolbar-row {
     align-items:center;
-  }
-  .toolbar-row + .toolbar-row {
-    padding-top:8px;
+    & + .toolbar-row {
+      padding-top:2px;
+    }
   }
   .v-main.main-map {
-    padding-top: 100px!important;
+    padding-top: 72px!important;
   }
-  .v-app-bar, .main-map /deep/ .v-toolbar__content{
-    height:100px!important;
+  .v-app-bar, .main-map ::v-deep .v-toolbar__content{
+    height:72px!important;
   }
-  .v-input__slider /deep/ .v-input__slot {
+  .v-input__slider ::v-deep .v-input__slot {
     margin-bottom:0px;
   }
-  .v-input__slider /deep/ .v-messages {
+  .v-input__slider ::v-deep .v-messages {
     display:none;
   }
   .v-dialog .v-main {
     padding-top:0px!important;
+  }
+  .map-loading-spinner {
+    position: absolute;
+    z-index: 1;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+  }
+  ::v-deep .v-text-field.v-autocomplete .v-input__control,
+  .v-autocomplete__content ::v-deep .v-list-item {
+    min-height:30px;
   }
 </style>
