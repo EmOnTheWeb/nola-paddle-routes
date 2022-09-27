@@ -99,7 +99,11 @@
               </v-list>
             </v-sheet>
           </v-col>
-
+          <v-progress-circular
+             v-if="!mapMarkersAdded"
+             indeterminate
+             color="primary"
+          ></v-progress-circular>
           <v-col cols="12" sm="10">
             <v-sheet
               height="calc(100vh - 124px)"
@@ -118,31 +122,36 @@
 <script>
   import {MainMap} from '../utils/mainMap';
   import {LouisianaTowns} from '../assets/louisianaTowns.js';
-  import IndividualView from '../pages/IndividualView.vue'
+  import IndividualView from '../pages/IndividualView.vue';
+  import NODE_API from '../utils/api';
 
   export default {
     components: {
       IndividualView,
     },
-    async mounted() {
-      try {
+    created() {
 
+      NODE_API.get('/getMapPins').then(response => {
+        this.paddles = response.data;
+      })
+      .catch(error => {
+        console.log(error);
+      });
+    },
+    async mounted() {
+
+      try {
         this.mainMap = new MainMap();
         await this.mainMap.initMap();
-
-        const callback = (paddleId) => {
-          let clickedPaddle = this.paddles.find((p) => p.id == paddleId);
-          this.goToIndividualView(clickedPaddle);
-        }
-
-        this.mainMap.addMapMarkers(this.paddles,callback);
-
       } catch (error) {
         console.error(error);
+      } finally {
+        this.componentHasMounted = true;
       }
     },
     methods: {
       hideShowMarkers() {
+
         let filteredPaddleIds = this.filteredPaddles.map((p) => p.id);
         this.mainMap.hideShowMarkers(filteredPaddleIds);
       },
@@ -166,6 +175,7 @@
         return Value * Math.PI / 180;
       },
       paddleWithinSearchRadius(searchCoords,resultsWithin,paddleCoords) {
+
         let distanceInMeters = this.calcCrow(searchCoords,paddleCoords);
         let distanceInMiles = distanceInMeters/1609.344;
         if ( distanceInMiles <= resultsWithin ) {
@@ -175,6 +185,7 @@
         }
       },
       getAndSetClosestCity(locationCoords) {
+
         let closestDistance = null;
         let closestTown;
         for(let i = 0; i < LouisianaTowns.length; i++) {
@@ -221,7 +232,27 @@
       },
     },
     computed: {
+      mapMarkersAdded() {
+
+        if (!this.componentHasMounted) {
+          return false;
+        }
+        if (!this.mainMap.hasOwnProperty('map') || this.paddles === []) {
+          return false;
+        }
+
+        const callback = (paddleId) => {
+          let clickedPaddle = this.paddles.find((p) => p.id == paddleId);
+          this.goToIndividualView(clickedPaddle);
+        }
+
+        this.mainMap.addMapMarkers(this.paddles,callback);
+        return true;
+      },
       filteredPaddles() {
+        if (this.paddles === []) {
+          return [];
+        }
 
         let filteredPaddles = [];
 
@@ -234,7 +265,8 @@
         const resultsWithin = this.resultsWithinDistance;
 
         filteredPaddles = this.paddles.filter((paddle) => {
-          let {lat, lng} = paddle.location.coordinates;
+          let [lng,lat]= paddle.pin;
+
           const paddleCoordinates = {lat: lat.toFixed(1), lng: lng.toFixed(1)};
           if(this.paddleWithinSearchRadius(
             searchCoordinates,
@@ -253,46 +285,8 @@
     data: () => ({
       isGettingLocation: false,
       resultsWithinDistance: 100,
-      mainMap: {},
-      paddles: [
-        {
-          id: 1,
-          name: 'Bay St. Louis Loop',
-          location: {
-            state: 'MS',
-            coordinates: {lat: 30.2988043, lng: -89.4077829}
-          },
-          tags: [
-            'Mississipi',
-            'Medium',
-            'Open water'
-          ]
-        },
-        {
-          id: 2,
-          name: 'Bayou St. John',
-          location: {
-            state: 'LA',
-            coordinates: {lat: 29.9761767, lng: -90.0936546}
-          },
-          tags: [
-            'Louisiana',
-            'Easy'
-          ]
-        },
-        {
-          id:3,
-          name: 'Cane Bayou',
-          location: {
-            state: 'LA',
-            coordinates: {lat: 30.3374409,lng: -90.006356}
-          },
-          tags: [
-            'Louisiana',
-            'Easy'
-          ]
-        }
-      ],
+      componentHasMounted: false,
+      paddles: [],
       select: null,
       keyword: '',
       items: LouisianaTowns,

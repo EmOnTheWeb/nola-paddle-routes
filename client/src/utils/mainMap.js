@@ -27,7 +27,7 @@ export class MainMap {
 
     this.markers = paddles.map((paddle) => {
       const marker = new mapboxgl.Marker()
-        .setLngLat([paddle.location.coordinates.lng, paddle.location.coordinates.lat])
+        .setLngLat([paddle.pin[0], paddle.pin[1]])
         .addTo(this.map);
 
       let markerElem = marker.getElement();
@@ -43,10 +43,11 @@ export class MainMap {
   }
 
   hideShowMarkers(filteredPaddleIds) {
+  
     this.markers.forEach((m) => {
       let markerElem = m.getElement();
 
-      if (filteredPaddleIds.includes(Number(markerElem.dataset.paddle_id))) {
+      if (filteredPaddleIds.includes(markerElem.dataset.paddle_id)) {
         markerElem.style.visibility = "visible";
       } else {
         markerElem.style.visibility = "hidden";

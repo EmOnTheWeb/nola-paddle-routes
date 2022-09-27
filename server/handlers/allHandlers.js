@@ -3,52 +3,75 @@ const fs = require('fs');
 const tj = require('@mapbox/togeojson');
 DOMParser = require('xmldom').DOMParser;
 
-module.exports = {
-  importRawData: function (_req, res) {
+async function getRouteNamesAndStartCoordinates(req,res) {
 
-    const db = dbo.getDb();
-    const paddlesCollection = db.collection('paddles');
-    const rawDataDir = process.cwd()+ '/rawData';
+  const db = dbo.getDb();
+  const paddlesCollection = db.collection('paddles');
+  let cursor = await paddlesCollection.find({});
 
-    fs.readdir(rawDataDir, function (err, files) {
+  let routeNamesAndStartCoordinates = [];
+  while (await cursor.hasNext()) {
+    let doc = await cursor.next();
+    let startCoord = doc.route[0];
+    routeNamesAndStartCoordinates.push(
+      {
+        'id':doc._id,
+        'name':doc.name,
+        'pin':startCoord
+      }
+    )
+  }
 
-      if (err) {
-        console.error("Could not list the directory.", err);
-        process.exit(1);
+  res.send(JSON.stringify(routeNamesAndStartCoordinates));
+}
+
+function importRawData(req,res) {
+
+  const db = dbo.getDb();
+  const paddlesCollection = db.collection('paddles');
+  const rawDataDir = process.cwd()+ '/rawData';
+
+  fs.readdir(rawDataDir, function (err, files) {
+
+    if (err) {
+      console.error("Could not list the directory.", err);
+      process.exit(1);
+    }
+
+    files.forEach(async function (file, index) {
+      let ext = file.split('.').pop();
+
+      let theCoords;
+      let routeName;
+      //if importing a kml file ...
+      if (ext === 'kml') {
+        let filePath = rawDataDir + '/' + file;
+        let theKML = new DOMParser().parseFromString(fs.readFileSync(filePath, 'utf8'));
+        //seems like the first <name> tag holds the route name
+        routeName = theKML.getElementsByTagName("name")[0].childNodes[0].nodeValue;
+        let theGeoJson = tj.kml(theKML);
+        let theRouteObj = theGeoJson.features.find((feature) => {
+          return feature.geometry.type == "LineString";
+        });
+        theCoords = theRouteObj.geometry.coordinates;
       }
 
-      files.forEach(async function (file, index) {
-        let ext = file.split('.').pop();
+      let count = paddlesCollection.countDocuments({ name: routeName })
 
-        let theCoords;
-        let routeName;
-        //if importing a kml file ...
-        if (ext === 'kml') {
-          let filePath = rawDataDir + '/' + file;
-          let theKML = new DOMParser().parseFromString(fs.readFileSync(filePath, 'utf8'));
-          //seems like the first <name> tag holds the route name
-          routeName = theKML.getElementsByTagName("name")[0].childNodes[0].nodeValue;
-          let theGeoJson = tj.kml(theKML);
-          let theRouteObj = theGeoJson.features.find((feature) => {
-            return feature.geometry.type == "LineString";
-          });
-          theCoords = theRouteObj.geometry.coordinates;
-        }
+      if (count === 0) {
 
-        let count = paddlesCollection.countDocuments({ name: routeName })
+        let paddle = {
+          name: routeName,
+          route: theCoords
+        };
 
-        if (count === 0) {
-
-          let paddle = {
-            name: routeName,
-            route: theCoords
-          };
-
-          await paddlesCollection.insertOne(
-            paddle
-          );
-        }
-      });
+        await paddlesCollection.insertOne(
+          paddle
+        );
+      }
     });
-  }
+  });
 }
+
+module.exports.importRawData = importRawData;
+module.exports.getRouteNamesAndStartCoordinates = getRouteNamesAndStartCoordinates;
