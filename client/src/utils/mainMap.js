@@ -43,7 +43,7 @@ export class MainMap {
   }
 
   hideShowMarkers(filteredPaddleIds) {
-  
+
     this.markers.forEach((m) => {
       let markerElem = m.getElement();
 

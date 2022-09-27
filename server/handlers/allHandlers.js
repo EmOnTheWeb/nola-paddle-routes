@@ -17,7 +17,8 @@ async function getRouteNamesAndStartCoordinates(req,res) {
       {
         'id':doc._id,
         'name':doc.name,
-        'pin':startCoord
+        'pin':startCoord,
+        'route':doc.route
       }
     )
   }

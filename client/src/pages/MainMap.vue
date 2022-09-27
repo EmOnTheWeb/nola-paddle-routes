@@ -84,6 +84,16 @@
           <v-col cols="2" class="d-none d-sm-block pr-0 pl-0 pt-0 pb-0">
             <v-sheet class="pt-1" style="height:100%;">
               <v-list color="transparent">
+                <v-list-item class="mb-1">
+                  <v-checkbox dense hide-details
+
+                  ></v-checkbox>
+                  <h4>Paddles</h4>
+                  <!-- <v-icon
+                    color="primary">
+                    mdi-close-box-outline
+                  </v-icon> -->
+                </v-list-item>
                 <v-list-item
                   v-for="(paddle, index) in filteredPaddles"
                   :key="index"
@@ -91,6 +101,14 @@
                   min-height="0"
                   @click="goToIndividualView(paddle)"
                 >
+                  <v-checkbox
+                    v-model="paddleRoutesShowing[paddle.id]"
+                    @change="togglePaddleRoute(paddle)"
+                    @click.stop
+                    dense
+                    hide-details
+                    color="primary">
+                  </v-checkbox>
                   <v-list-item-content>
                     <v-list-item-title>
                       {{ paddle.name }}
@@ -100,9 +118,9 @@
               </v-list>
             </v-sheet>
           </v-col>
-          <v-col cols="12" sm="10">
+          <v-col cols="12" sm="10" class="pr-0 pl-0 pt-0 pb-0">
             <v-sheet
-              height="calc(100vh - 96px)"
+              height="calc(100vh - 72px)"
               rounded="lg"
               style="position:relative;"
             >
@@ -113,6 +131,14 @@
                  class="map-loading-spinner"
               ></v-progress-circular>
               <div id="map"></div>
+              <v-btn class="center-on-location" small depressed
+                @click="useCurrentLocation(true)">
+                <v-icon
+                  dark
+                  color="primary">
+                  mdi-crosshairs-gps
+                </v-icon>
+              </v-btn>
             </v-sheet>
           </v-col>
         </v-row>
@@ -152,6 +178,15 @@
       }
     },
     methods: {
+      togglePaddleRoute(paddle) {
+        console.log(paddle);
+        if(this.paddleRoutesShowing.includes(paddle.id)) {
+          let elemIndex = this.paddleRoutesShowing.findIndex(paddle.id);
+          this.paddleRoutesShowing.splice(elemIndex,1);
+        } else {
+          this.paddleRoutesShowing.push(paddle.id);
+        }
+      },
       hideShowMarkers() {
 
         let filteredPaddleIds = this.filteredPaddles.map((p) => p.id);
@@ -200,9 +235,11 @@
         }
         this.select = closestTown.location;
       },
-      useCurrentLocation() {
+      useCurrentLocation(goToOnly = false) {
 
-        this.isGettingLocation = true;
+        if (!goToOnly) {
+          this.isGettingLocation = true;
+        }
 
         const options = {
           enableHighAccuracy: false,
@@ -216,7 +253,11 @@
           let {latitude, longitude} = coords;
           let adjustedCoords = { lat:latitude, lng:longitude};
           this.isGettingLocation = false;
-          this.getAndSetClosestCity(adjustedCoords);
+
+          if (!goToOnly) {
+            this.getAndSetClosestCity(adjustedCoords);
+          }
+
           this.mainMap.centerOnCurrentLocation(adjustedCoords);
         }
 
@@ -292,7 +333,8 @@
       select: null,
       keyword: '',
       items: LouisianaTowns,
-      showIndividualView: false
+      showIndividualView: false,
+      paddleRoutesShowing: {}
     }),
   }
 
@@ -322,6 +364,12 @@
       padding-top:2px;
     }
   }
+  .main-map .v-list-item {
+    padding-left:4px;
+    ::v-deep .v-input--selection-controls__input {
+      margin-right:4px;
+    }
+  }
   .v-main.main-map {
     padding-top: 72px!important;
   }
@@ -344,8 +392,17 @@
     top: 50%;
     transform: translate(-50%,-50%);
   }
+  .center-on-location {
+    position:absolute;
+    z-index: 1000;
+    right:10px;
+    bottom:30px;
+  }
   ::v-deep .v-text-field.v-autocomplete .v-input__control,
-  .v-autocomplete__content ::v-deep .v-list-item {
-    min-height:30px;
+  .v-sheet.v-select-list ::v-deep .v-list-item {
+    min-height:30px!important;
+  }
+  .v-input--hide-details.v-input--checkbox {
+    margin-top:0px; padding-top:0px;
   }
 </style>
