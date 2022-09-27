@@ -5,18 +5,11 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 let dbConnection;
 
 module.exports = {
-  connectToServer: (callback) => {
-    client.connect((err, db) => {
-      if (err || !db) {
-        return callback(err);
-      }
-
-      dbConnection = db.db("paddleroutes");
-      
-      console.log("Successfully connected to MongoDB.");
-
-      return callback();
-    });
+  connectToServer: async (callback) => {
+    await client.connect();
+    dbConnection = await client.db("PaddleRoutes");
+    console.log("Successfully connected to MongoDB.");
+    callback(); 
   },
 
   getDb: () => {
