@@ -86,7 +86,10 @@
               <v-list color="transparent">
                 <v-list-item class="mb-1">
                   <v-checkbox dense hide-details
-
+                    v-model="aPaddleRouteIsShowing"
+                    color="orange darken-3"
+                    :disabled="!aPaddleRouteIsShowing"
+                    @click="hideAllRoutes()"
                   ></v-checkbox>
                   <h4>Paddles</h4>
                   <!-- <v-icon
@@ -99,15 +102,16 @@
                   :key="index"
                   link
                   min-height="0"
-                  @click="goToIndividualView(paddle)"
+                  @click="togglePaddleRoute(paddle)"
+                  :class="paddleRoutesShowing[paddle.id] ? 'route-showing':''"
                 >
                   <v-checkbox
                     v-model="paddleRoutesShowing[paddle.id]"
-                    @change="togglePaddleRoute(paddle)"
-                    @click.stop
                     dense
                     hide-details
-                    color="primary">
+                    color="orange darken-3"
+                    style="pointer-events:none;"
+                  >
                   </v-checkbox>
                   <v-list-item-content>
                     <v-list-item-title>
@@ -152,6 +156,7 @@
   import {LouisianaTowns} from '../assets/louisianaTowns.js';
   import IndividualView from '../pages/IndividualView.vue';
   import NODE_API from '../utils/api';
+  import Vue from 'vue';
 
   export default {
     components: {
@@ -178,13 +183,14 @@
       }
     },
     methods: {
+      hideAllRoutes() {
+        this.paddleRoutesShowing = {};
+      },
       togglePaddleRoute(paddle) {
-        console.log(paddle);
-        if(this.paddleRoutesShowing.includes(paddle.id)) {
-          let elemIndex = this.paddleRoutesShowing.findIndex(paddle.id);
-          this.paddleRoutesShowing.splice(elemIndex,1);
+        if(!this.paddleRoutesShowing.hasOwnProperty(paddle.id) || this.paddleRoutesShowing[paddle.id] === false) {
+          Vue.set(this.paddleRoutesShowing, paddle.id, true);
         } else {
-          this.paddleRoutesShowing.push(paddle.id);
+          Vue.set(this.paddleRoutesShowing, paddle.id, false);
         }
       },
       hideShowMarkers() {
@@ -275,6 +281,19 @@
       },
     },
     computed: {
+      aPaddleRouteIsShowing: {
+         get(){
+           for (const paddleId in this.paddleRoutesShowing) {
+             if (this.paddleRoutesShowing[paddleId]) {
+               return true;
+             }
+           }
+           return false;
+         },
+         set(val){
+           return val; 
+         }
+      },
       mapMarkersAdded() {
 
         if (!this.componentHasMounted) {
@@ -404,5 +423,8 @@
   }
   .v-input--hide-details.v-input--checkbox {
     margin-top:0px; padding-top:0px;
+  }
+  .route-showing.v-list-item--link:before{
+    opacity:0.04;
   }
 </style>
