@@ -83,7 +83,7 @@
         <v-row>
           <v-col cols="2" class="d-none d-sm-block pr-0 pl-0 pt-0 pb-0">
             <v-sheet class="pt-1" style="height:100%;">
-              <v-list color="transparent">
+              <v-list color="transparent" text-color="primary">
                 <v-list-item class="mb-1">
                   <v-checkbox dense hide-details
                     v-model="aPaddleRouteIsShowing"
@@ -255,7 +255,11 @@
         this.select = closestTown.location;
       },
       resetMap() {
-        this.mainMap.centerOnLocation();
+        let coords = null;
+        if (this.myLocation) {
+          coords = this.myLocation
+        }
+        this.mainMap.centerOnLocation(coords);
       },
       useCurrentLocation(goToOnly = false) {
 
@@ -274,6 +278,8 @@
 
           let {latitude, longitude} = coords;
           let adjustedCoords = { lat:latitude, lng:longitude};
+          //save for later -- if user hits back button (bottom left) it will take them back here.
+          this.myLocation = adjustedCoords;
           this.isGettingLocation = false;
 
           if (!goToOnly) {
@@ -369,7 +375,8 @@
       keyword: '',
       items: LouisianaTowns,
       showIndividualView: false,
-      paddleRoutesShowing: {}
+      paddleRoutesShowing: {},
+      myLocation: {}
     }),
   }
 
@@ -401,6 +408,7 @@
   }
   .main-map .v-list-item {
     padding-left:4px;
+    margin-bottom:-5px;
     ::v-deep .v-input--selection-controls__input {
       margin-right:4px;
     }

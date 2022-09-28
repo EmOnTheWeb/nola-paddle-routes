@@ -77,21 +77,17 @@ export class MainMap {
 
     if (typeof source !== 'undefined') {
 
-      let features = [];
-      for (let i = 0; i < idPaddlesToShow.length; i++) {
-        let id = idPaddlesToShow[i];
+      let features = idPaddlesToShow.map((id) => {
         let thePaddle = paddleData.find((e) => e.id === id);
-
-        let feature = {
+        return {
           'type': 'Feature',
           'properties': { 'name': thePaddle.name },
           'geometry': {
             'type': 'LineString',
             'coordinates': thePaddle.route
           }
-        };
-        features.push(feature);
-      }
+        }
+      })
       //update the source
       source.setData({
         "type": "FeatureCollection",
