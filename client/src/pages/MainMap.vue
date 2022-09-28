@@ -140,7 +140,7 @@
                 <v-icon
                   dark
                   color="primary">
-                  mdi-restart
+                  mdi-magnify-minus-cursor
                 </v-icon>
               </v-btn>
             </v-sheet>
@@ -185,14 +185,26 @@
     methods: {
       hideAllRoutes() {
         this.paddleRoutesShowing = {};
+        this.mainMap.removeAllRoutes();
       },
       togglePaddleRoute(paddle) {
         if(!this.paddleRoutesShowing.hasOwnProperty(paddle.id) || this.paddleRoutesShowing[paddle.id] === false) {
           Vue.set(this.paddleRoutesShowing, paddle.id, true);
-          this.mainMap.showPaddleRoute(paddle);
         } else {
           Vue.set(this.paddleRoutesShowing, paddle.id, false);
         }
+
+        let idPaddleRoutesToShow = this.getIdPaddleRoutesShowing();
+        this.mainMap.drawPaddleRoutes(idPaddleRoutesToShow, this.paddles )
+      },
+      getIdPaddleRoutesShowing() {
+        let paddleRoutesToShow = [];
+        for (let paddleId in this.paddleRoutesShowing) {
+          if (this.paddleRoutesShowing[paddleId]) {
+            paddleRoutesToShow.push(paddleId);
+          }
+        }
+        return paddleRoutesToShow;
       },
       hideShowMarkers() {
 
@@ -309,7 +321,7 @@
 
         const callback = (paddleId) => {
           let clickedPaddle = this.paddles.find((p) => p.id == paddleId);
-          this.goToIndividualView(clickedPaddle);
+          this.togglePaddleRoute(clickedPaddle);
         }
 
         this.mainMap.addMapMarkers(this.paddles,callback);
@@ -438,6 +450,6 @@
     height: 32px;
     cursor: pointer;
     margin-left:-10px;
-    margin-top:4px; 
+    margin-top:4px;
   }
 </style>

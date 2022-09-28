@@ -66,31 +66,76 @@ export class MainMap {
     return this.markers;
   }
 
-  showPaddleRoute(paddle) {
-    this.map.addSource('route', {
-        'type': 'geojson',
-        'data': {
-          'type': 'Feature',
-          'properties': {},
-          'geometry': {
-          'type': 'LineString',
-          'coordinates': paddle.route
-        }
-      }
-    });
+  drawPaddleRoutes(idPaddlesToShow, paddleData) {
 
-    this.map.addLayer({
-      'id': paddle.id,
-      'type': 'line',
-      'source': 'route',
-      'layout': {
-      'line-join': 'round',
-      'line-cap': 'round'
-      },
-      'paint': {
-      'line-color': '#888',
-      'line-width': 8
+    if (idPaddlesToShow.length === 0) {
+      this.removeAllRoutes();
+    }
+
+    //if source already exists, push to features array and update source data
+    let source = this.map.getSource('routes');
+
+    if (typeof source !== 'undefined') {
+
+      let features = [];
+      for (let i = 0; i < idPaddlesToShow.length; i++) {
+        let id = idPaddlesToShow[i];
+        let thePaddle = paddleData.find((e) => e.id === id);
+
+        let feature = {
+          'type': 'Feature',
+          'properties': { 'name': thePaddle.name },
+          'geometry': {
+            'type': 'LineString',
+            'coordinates': thePaddle.route
+          }
+        };
+        features.push(feature);
       }
+      //update the source
+      source.setData({
+        "type": "FeatureCollection",
+        "features": features
+      });
+
+    } else {
+      //otherwise add the source with the route
+      let thePaddle = paddleData.find((e) => e.id === idPaddlesToShow[0]);
+
+      let feature = {
+        'type': 'Feature',
+        'properties': { 'name': thePaddle.name },
+        'geometry': {
+          'type': 'LineString',
+          'coordinates': thePaddle.route
+        }
+      };
+      this.map.addSource('routes', {
+          'type': 'geojson',
+          'data': {
+            'type': 'FeatureCollection',
+            'features': [
+               feature
+             ]
+          }
+      });
+
+      this.map.addLayer({
+        'id': 'layer',
+        'type': 'line',
+        'source': 'routes',
+        'paint': {
+        'line-color': '#ef6c00',
+        'line-width': 4
+        }
+      });
+    }
+  }
+
+  removeAllRoutes() {
+    this.map.getSource('routes').setData({
+      "type": "FeatureCollection",
+      "features": []
     });
   }
 }
