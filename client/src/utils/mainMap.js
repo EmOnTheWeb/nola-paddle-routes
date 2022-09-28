@@ -4,6 +4,7 @@ export class MainMap {
   constructor() {
     this.map = {};
     this.markers = [];
+    this.originalCoords = [-89.4077829,30.2988043]; // starting position [lng, lat]
   }
 
   async initMap() {
@@ -12,21 +13,27 @@ export class MainMap {
       container: 'map', // container ID
       // Choose from Mapbox's core styles, or make your own style with Mapbox Studio
       style: 'mapbox://styles/mapbox/outdoors-v11',
-      center: [-89.4077829,30.2988043], // starting position [lng, lat]
+      center: this.originalCoords,
       zoom: 8,
       });
   }
 
-  centerOnCurrentLocation(locationCoords) {
+  centerOnLocation(locationCoords) {
     this.map.flyTo({
-      center:[locationCoords.lng, locationCoords.lat]
+      center:(locationCoords) ? [locationCoords.lng, locationCoords.lat] : this.originalCoords,
+      zoom:8,
+      speed: 2,
     });
   }
 
   addMapMarkers(paddles, clickCallback) {
 
     this.markers = paddles.map((paddle) => {
-      const marker = new mapboxgl.Marker()
+
+      const el = document.createElement('div');
+      el.className = 'marker';
+
+      const marker = new mapboxgl.Marker(el, {anchor:'bottom-left'})
         .setLngLat([paddle.pin[0], paddle.pin[1]])
         .addTo(this.map);
 
@@ -57,5 +64,33 @@ export class MainMap {
 
   getMapMarkers() {
     return this.markers;
+  }
+
+  showPaddleRoute(paddle) {
+    this.map.addSource('route', {
+        'type': 'geojson',
+        'data': {
+          'type': 'Feature',
+          'properties': {},
+          'geometry': {
+          'type': 'LineString',
+          'coordinates': paddle.route
+        }
+      }
+    });
+
+    this.map.addLayer({
+      'id': paddle.id,
+      'type': 'line',
+      'source': 'route',
+      'layout': {
+      'line-join': 'round',
+      'line-cap': 'round'
+      },
+      'paint': {
+      'line-color': '#888',
+      'line-width': 8
+      }
+    });
   }
 }

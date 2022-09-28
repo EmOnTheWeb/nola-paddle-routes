@@ -136,11 +136,11 @@
               ></v-progress-circular>
               <div id="map"></div>
               <v-btn class="center-on-location" small depressed
-                @click="useCurrentLocation(true)">
+                @click="resetMap()">
                 <v-icon
                   dark
                   color="primary">
-                  mdi-crosshairs-gps
+                  mdi-restart
                 </v-icon>
               </v-btn>
             </v-sheet>
@@ -189,6 +189,7 @@
       togglePaddleRoute(paddle) {
         if(!this.paddleRoutesShowing.hasOwnProperty(paddle.id) || this.paddleRoutesShowing[paddle.id] === false) {
           Vue.set(this.paddleRoutesShowing, paddle.id, true);
+          this.mainMap.showPaddleRoute(paddle);
         } else {
           Vue.set(this.paddleRoutesShowing, paddle.id, false);
         }
@@ -241,6 +242,9 @@
         }
         this.select = closestTown.location;
       },
+      resetMap() {
+        this.mainMap.centerOnLocation(); 
+      },
       useCurrentLocation(goToOnly = false) {
 
         if (!goToOnly) {
@@ -264,7 +268,7 @@
             this.getAndSetClosestCity(adjustedCoords);
           }
 
-          this.mainMap.centerOnCurrentLocation(adjustedCoords);
+          this.mainMap.centerOnLocation(adjustedCoords);
         }
 
         const error = (err) => {
@@ -291,7 +295,7 @@
            return false;
          },
          set(val){
-           return val; 
+           return val;
          }
       },
       mapMarkersAdded() {
@@ -426,5 +430,13 @@
   }
   .route-showing.v-list-item--link:before{
     opacity:0.04;
+  }
+  ::v-deep .marker {
+    background-image: url('../assets/mapbox-icon.png');
+    background-size: cover;
+    width: 20px;
+    height: 28px;
+    cursor: pointer;
+    margin-left:-10px;
   }
 </style>
