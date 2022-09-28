@@ -243,7 +243,7 @@
         this.select = closestTown.location;
       },
       resetMap() {
-        this.mainMap.centerOnLocation(); 
+        this.mainMap.centerOnLocation();
       },
       useCurrentLocation(goToOnly = false) {
 
@@ -435,8 +435,9 @@
     background-image: url('../assets/mapbox-icon.png');
     background-size: cover;
     width: 20px;
-    height: 28px;
+    height: 32px;
     cursor: pointer;
     margin-left:-10px;
+    margin-top:4px; 
   }
 </style>
