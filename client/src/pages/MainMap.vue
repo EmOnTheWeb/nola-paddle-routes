@@ -40,12 +40,12 @@
                 small
                 color="primary"
                 @click="useCurrentLocation()"
+                title="Get your location to use in the search bar"
               >
                 <!-- <span class="d-none d-sm-inline">use my location</span> -->
                 <v-icon
                   dark
                   v-show="!isGettingLocation"
-                  title="Get your location to use in the search bar"
                   >
                   mdi-crosshairs-gps
                 </v-icon>
@@ -117,7 +117,7 @@
                     style="pointer-events:none;"
                   >
                   </v-checkbox>
-                  <v-list-item-content>
+                  <v-list-item-content @click="(evt)=>ifRouteShowingShowIndividualView(paddle,evt)">
                     <v-list-item-title>
                       {{ paddle.name }}
                     </v-list-item-title>
@@ -138,11 +138,37 @@
                  color="warning"
                  class="map-loading-spinner"
               ></v-progress-circular>
-              <div id="map"></div>
-              <v-btn class="center-on-location" small depressed
-                @click="resetMap()">
+              <v-btn class="map-icon zoom-in" small depressed
+                @click="mainMap.zoomIn()"
+                title="Zoom in">
                 <v-icon
-                  title="Zoom out to map's original position"
+                  dark
+                  color="primary">
+                  mdi-plus-thick
+                </v-icon>
+              </v-btn>
+              <v-btn class="map-icon zoom-out" small depressed
+                @click="mainMap.zoomOut()"
+                title="Zoom out">
+                <v-icon
+                  dark
+                  color="primary">
+                  mdi-minus-thick
+                </v-icon>
+              </v-btn>
+              <v-btn class="map-icon printer" small depressed
+                title="Print">
+                <v-icon
+                  dark
+                  color="primary">
+                  mdi-printer
+                </v-icon>
+              </v-btn>
+              <div id="map"></div>
+              <v-btn class="map-icon center-on-location" small depressed
+                @click="resetMap()"
+                title="Zoom out to map's original position">
+                <v-icon
                   dark
                   color="primary">
                   mdi-magnify-minus-cursor
@@ -188,6 +214,15 @@
       }
     },
     methods: {
+      ifRouteShowingShowIndividualView(paddle,evt) {
+        if (this.paddleRoutesShowing[paddle.id]) {
+          evt.stopPropagation();
+          //if not in bounds -- this.mainMap.flyToFitRouteBounds(paddle);
+          //else
+          this.paddleClicked = this.paddles.find((p) => p.id ===paddle.id);
+          this.showIndividualView = true;
+        }
+      },
       hideAllRoutes() {
         this.paddleRoutesShowing = {};
         this.mainMap.removeAllRoutes();
@@ -346,7 +381,12 @@
 
         const callback = (paddleId) => {
           let clickedPaddle = this.paddles.find((p) => p.id == paddleId);
-          this.togglePaddleRoute(clickedPaddle);
+          if (this.paddleRoutesShowing[paddleId]) {
+            this.paddleClicked=clickedPaddle;
+            this.showIndividualView=true;
+          } else {
+            this.togglePaddleRoute(clickedPaddle);
+          }
         }
 
         this.mainMap.addMapMarkers(this.paddles,callback);
@@ -462,11 +502,27 @@
     top: 50%;
     transform: translate(-50%,-50%);
   }
-  .center-on-location {
+  button.map-icon.v-btn {
+    padding: 0px 0px;
+    min-width: 28px;
     position:absolute;
-    z-index: 1000;
-    right:10px;
-    bottom:30px;
+    z-index: 5;
+    &.center-on-location {
+      right:10px;
+      bottom:30px;
+    }
+    &.zoom-in {
+      top: 50px;
+      left: 5px;
+    }
+    &.zoom-out {
+      top: 85px;
+      left: 5px;
+    }
+    &.printer {
+      top:150px;
+      left:5px;
+    }
   }
   ::v-deep .v-text-field.v-autocomplete .v-input__control,
   .v-sheet.v-select-list ::v-deep .v-list-item {

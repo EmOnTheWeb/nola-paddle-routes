@@ -179,4 +179,12 @@ export class MainMap {
     });
 
   }
+
+  zoomIn() {
+    this.map.zoomIn();
+  }
+
+  zoomOut() {
+    this.map.zoomOut(); 
+  }
 }
