@@ -1,7 +1,7 @@
 <template>
   <div>
-    <v-dialog :fullscreen="true" v-model="showIndividualView">
-      <individual-view @back="showIndividualView = false"></individual-view>
+    <v-dialog v-model="showIndividualView" max-width="350">
+      <individual-view-2 :paddle="paddleClicked" @back="showIndividualView = false"></individual-view-2>
     </v-dialog>
     <v-app-bar
       app
@@ -9,69 +9,73 @@
       flat
     >
       <v-container fluid class="pa-0 fill-height">
-        <!--<v-col cols="2" class="d-none d-sm-flex">
-        </v-col>-->
-        <v-col cols="12" >
+        <v-col cols="2" class="d-none d-sm-flex">
+        </v-col>
+        <v-col cols="10" >
           <v-row class="toolbar-row">
-            <v-autocomplete
-              v-model="select"
-              @change="hideShowMarkers()"
-              :items="items"
-              item-text="name"
-              item-value="location"
-              cache-items
-              class="mr-2 mb-0 mr-sm-2"
-              flat
-              hide-no-data
-              hide-details
-              label="Location"
-              solo-inverted
-              min-height="28"
-            >
-              <template v-slot:selection="data">
-                {{data.item.name}}, {{data.item.adminCode}}
-              </template>
-              <template v-slot:item="data">
-                  {{ data.item.name }}, {{ data.item.adminCode }}
-              </template>
-            </v-autocomplete>
-            <v-btn
-              outlined
-              small
-              color="primary"
-              @click="useCurrentLocation()"
-            >
-              <span class="d-none d-sm-inline">use my location</span>
-              <v-icon
-                right
-                dark
-                v-show="!isGettingLocation"
-                >
-                mdi-crosshairs-gps
-              </v-icon>
-              <v-progress-circular
-                 v-show="isGettingLocation"
-                 indeterminate
-                 size="18"
-                 width="2"
-                 style="margin-left:8px;"
-               ></v-progress-circular>
-            </v-btn>
-          </v-row>
-          <v-row class="toolbar-row">
-              <span style="font-size:0.85rem; width:200px;">
-                Show results within <span style="font-size:1.25rem;">{{resultsWithinDistance}}</span> miles
+              <v-autocomplete
+                v-model="select"
+                @change="hideShowMarkers()"
+                :items="items"
+                item-text="name"
+                item-value="location"
+                cache-items
+                class="mr-2 mb-0 mr-sm-2"
+                flat
+                hide-no-data
+                hide-details
+                label="Location"
+                solo-inverted
+                min-height="28"
+              >
+                <template v-slot:selection="data">
+                  {{data.item.name}}, {{data.item.adminCode}}
+                </template>
+                <template v-slot:item="data">
+                    {{ data.item.name }}, {{ data.item.adminCode }}
+                </template>
+              </v-autocomplete>
+              <v-btn
+                outlined
+                small
+                color="primary"
+                @click="useCurrentLocation()"
+              >
+                <!-- <span class="d-none d-sm-inline">use my location</span> -->
+                <v-icon
+                  dark
+                  v-show="!isGettingLocation"
+                  title="Get your location to use in the search bar"
+                  >
+                  mdi-crosshairs-gps
+                </v-icon>
+                <v-progress-circular
+                   v-show="isGettingLocation"
+                   indeterminate
+                   size="18"
+                   width="2"
+                 ></v-progress-circular>
+              </v-btn>
+
+            <div style="min-width:250px;" class="ml-3">
+              <span style="font-size: 0.8rem;width: 105px;line-height:1;">
+                Show results within <span style="font-size:1.2rem;">{{resultsWithinDistance}}</span> miles
               </span>
 
               <v-slider
                v-model="resultsWithinDistance"
                step="10"
                ticks
-               tick-size="4"
-                max="500"
+               tick-size="2"
+               height="10"
+                max="300"
                 min="0"
                 @input="hideShowMarkers"
               ></v-slider>
+            </div>
+          </v-row>
+          <v-row class="toolbar-row">
+
           </v-row>
         </v-col>
 
@@ -91,7 +95,7 @@
                     :disabled="!aPaddleRouteIsShowing"
                     @click="hideAllRoutes()"
                   ></v-checkbox>
-                  <h4>Paddles</h4>
+                  <h4 style="color:#595358;">Paddles</h4>
                   <!-- <v-icon
                     color="primary">
                     mdi-close-box-outline
@@ -124,7 +128,7 @@
           </v-col>
           <v-col cols="12" sm="10" class="pr-0 pl-0 pt-0 pb-0">
             <v-sheet
-              height="calc(100vh - 72px)"
+              height="calc(100vh - 52px)"
               rounded="lg"
               style="position:relative;"
             >
@@ -138,6 +142,7 @@
               <v-btn class="center-on-location" small depressed
                 @click="resetMap()">
                 <v-icon
+                  title="Zoom out to map's original position"
                   dark
                   color="primary">
                   mdi-magnify-minus-cursor
@@ -154,13 +159,13 @@
 <script>
   import {MainMap} from '../utils/mainMap';
   import {LouisianaTowns} from '../assets/louisianaTowns.js';
-  import IndividualView from '../pages/IndividualView.vue';
+  import IndividualView2 from '../pages/IndividualView2.vue';
   import NODE_API from '../utils/api';
   import Vue from 'vue';
 
   export default {
     components: {
-      IndividualView,
+      IndividualView2,
     },
     created() {
 
@@ -188,14 +193,27 @@
         this.mainMap.removeAllRoutes();
       },
       togglePaddleRoute(paddle) {
+
+        let paddleToggledOn = false;
         if(!this.paddleRoutesShowing.hasOwnProperty(paddle.id) || this.paddleRoutesShowing[paddle.id] === false) {
           Vue.set(this.paddleRoutesShowing, paddle.id, true);
+          paddleToggledOn = true;
         } else {
           Vue.set(this.paddleRoutesShowing, paddle.id, false);
         }
 
+        const handlePaddleRouteClicked = (paddleName) => {
+          this.paddleClicked = this.paddles.find((p) => p.name.toLowerCase() === paddleName.toLowerCase());
+          this.showIndividualView = true;
+        }
+
         let idPaddleRoutesToShow = this.getIdPaddleRoutesShowing();
-        this.mainMap.drawPaddleRoutes(idPaddleRoutesToShow, this.paddles )
+        this.mainMap.drawPaddleRoutes(idPaddleRoutesToShow,this.paddles,handlePaddleRouteClicked);
+
+        if(paddleToggledOn) {
+          this.mainMap.flyToFitRouteBounds(paddle);
+          // this.mainMap.showMoreInfoButton(paddle.id);
+        }
       },
       getIdPaddleRoutesShowing() {
         let paddleRoutesToShow = [];
@@ -255,10 +273,11 @@
         this.select = closestTown.location;
       },
       resetMap() {
-        let coords = null;
-        if (this.myLocation) {
+        let coords = false;
+        if (this.myLocation.lat !== undefined) {
           coords = this.myLocation
         }
+
         this.mainMap.centerOnLocation(coords);
       },
       useCurrentLocation(goToOnly = false) {
@@ -376,7 +395,8 @@
       items: LouisianaTowns,
       showIndividualView: false,
       paddleRoutesShowing: {},
-      myLocation: {}
+      myLocation: {},
+      paddleClicked: {}
     }),
   }
 
@@ -414,17 +434,24 @@
     }
   }
   .v-main.main-map {
-    padding-top: 72px!important;
+    padding-top: 52px!important;
   }
-  .v-app-bar, .main-map ::v-deep .v-toolbar__content{
-    height:72px!important;
+  .v-app-bar, ::v-deep .v-toolbar__content{
+    height:52px!important;
   }
-  .v-input__slider ::v-deep .v-input__slot {
-    margin-bottom:0px;
+  ::v-deep .v-toolbar__content {
+    padding-left:0px; padding-right:0px;
   }
-  .v-input__slider ::v-deep .v-messages {
-    display:none;
+  ::v-deep .v-slider--horizontal { margin-left:0px; margin-right:0px; }
+  .v-input__slider {
+    ::v-deep .v-input__slot {
+      margin-bottom:0px;
+    }
+    ::v-deep .v-messages {
+      display:none;
+    }
   }
+
   .v-dialog .v-main {
     padding-top:0px!important;
   }
@@ -445,6 +472,18 @@
   .v-sheet.v-select-list ::v-deep .v-list-item {
     min-height:30px!important;
   }
+
+  .v-autocomplete {
+    & + button.v-size--small {
+      padding-left: 0px;
+      padding-right: 0px;
+      min-width: 30px;
+      i { font-size:19px; }
+    }
+    max-width:400px;
+
+  }
+
   .v-input--hide-details.v-input--checkbox {
     margin-top:0px; padding-top:0px;
   }

@@ -100,11 +100,11 @@
   export default {
     name: 'IndividualView',
     props: {
-      initialData: Object,
+      paddle: Object,
       show: Boolean
     },
     mounted() {
-
+      console.log(this.paddle);
     },
     methods: {
       goBack() {
@@ -161,22 +161,22 @@
       routeMap: null,
       routeMapExpanded: false,
       mapIsLoaded: false,
-      paddle: {
-        id: 4,
-        name: 'Abita river out and back',
-        description: 'Peaceful paddle down a winding river free from motorized boats. But then you encounter progressively worse blowdowns until its time to turn back, unless you want to do battle with branches',
-        difficulty: 'Medium',
-        distance: '6.5 miles',
-        launch: {
-          notes:'Put in from the grass to the side of the concrete ramp',
-          coordinates:{ long:-90.10481683, lat:30.45592972 }
-        },
-        tags: [
-          'Louisiana',
-          'Medium Difficulty'
-        ],
-        imgSrc: 'route.png'
-      }
+      // paddle: {
+      //   id: 4,
+      //   name: 'Abita river out and back',
+      //   description: 'Peaceful paddle down a winding river free from motorized boats. But then you encounter progressively worse blowdowns until its time to turn back, unless you want to do battle with branches',
+      //   difficulty: 'Medium',
+      //   distance: '6.5 miles',
+      //   launch: {
+      //     notes:'Put in from the grass to the side of the concrete ramp',
+      //     coordinates:{ long:-90.10481683, lat:30.45592972 }
+      //   },
+      //   tags: [
+      //     'Louisiana',
+      //     'Medium Difficulty'
+      //   ],
+      //   imgSrc: 'route.png'
+      // }
     }),
   }
 </script>

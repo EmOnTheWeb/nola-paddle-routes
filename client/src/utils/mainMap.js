@@ -19,6 +19,7 @@ export class MainMap {
   }
 
   centerOnLocation(locationCoords) {
+
     this.map.flyTo({
       center:(locationCoords) ? [locationCoords.lng, locationCoords.lat] : this.originalCoords,
       zoom:8,
@@ -62,11 +63,27 @@ export class MainMap {
     });
   }
 
+  showMoreInfoButton(idPaddle) {
+    let theMarker;
+    this.markers.forEach((m) => {
+      let markerElem = m.getElement();
+      if ( markerElem.dataset.paddle_id == idPaddle ) {
+        theMarker = markerElem;
+      }
+    });
+
+    let icon = document.createElement('i');
+    icon.classList.add('v-icon', 'v-icon__more-info', 'notranslate','mdi','mdi-information-outline','theme--dark','primary--text');
+    icon.dataset.paddle_id = idPaddle;
+
+    theMarker.after(icon);
+  }
+
   getMapMarkers() {
     return this.markers;
   }
 
-  drawPaddleRoutes(idPaddlesToShow, paddleData) {
+  drawPaddleRoutes(idPaddlesToShow, paddleData, callback) {
 
     if (idPaddlesToShow.length === 0) {
       this.removeAllRoutes();
@@ -122,9 +139,20 @@ export class MainMap {
         'source': 'routes',
         'paint': {
         'line-color': '#ef6c00',
-        'line-width': 4
+        'line-width': 6
         }
       });
+
+      this.map.on('click', 'layer', (e) => {
+        callback(e.features[0].properties.name);
+      });
+
+      this.map.on('mouseenter', 'layer', () => {
+        this.map.getCanvas().style.cursor = 'pointer'
+      });
+      this.map.on('mouseleave', 'layer', () => {
+        this.map.getCanvas().style.cursor = ''
+      })
     }
   }
 
@@ -133,5 +161,22 @@ export class MainMap {
       "type": "FeatureCollection",
       "features": []
     });
+  }
+
+  flyToFitRouteBounds(paddleObj) {
+
+    const bounds = new mapboxgl.LngLatBounds(
+        paddleObj.pin,
+        paddleObj.pin
+    );
+
+    for (const coord of paddleObj.route) {
+      bounds.extend(coord);
+    }
+
+    this.map.fitBounds(bounds, {
+      padding: 100
+    });
+
   }
 }
