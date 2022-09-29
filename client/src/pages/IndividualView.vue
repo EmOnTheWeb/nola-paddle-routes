@@ -1,115 +1,65 @@
 <template>
-  <v-main class="grey lighten-3">
-    <v-container>
-      <div class="map-container" v-show="routeMapExpanded">
-        <div class="btn-container">
-          <v-btn color="primary" depressed
-            @click="generateAndExportGPXFile()">
-            Export Route
-            <v-icon dark>
-            mdi-file-export-outline
-            </v-icon>
-          </v-btn>
-          <v-btn color="primary" depressed
-            @click="showRouteMapPrintDialog()">
-            Print Route Map
-            <v-icon dark>
-            mdi-printer
-            </v-icon>
-          </v-btn>
-        </div>
-        <v-icon
-          dark
-          class="toggle-mapsize-icon"
-          @click="collapseRouteMap()"
+  <v-card>
+    <v-card-title>{{paddle.name}}</v-card-title>
+    <v-icon class="icon--close" color="primary" @click="close()">mdi-close</v-icon>
+    <v-card-text>
+      <p>the description</p>
+      <p>the distance</p>
+      <p>boat launch type</p>
+      <div class="tags-and-actions">
+        <div class="tags">
+          <v-chip
+            v-for="(tag,index) in ['hard','open water']"
+            :key="index"
           >
-          mdi-arrow-expand
-        </v-icon>
-        <v-img
-          :src="require(`@/dummy/${paddle.imgSrc}`)"
-        ></v-img>
-      </div>
-
-      <v-toolbar flat>
-        <v-btn @click="goBack()" class="btn-back px-1 px-sm-4" depressed text-color="secondary" min-width="20">
-          <v-icon dark left>mdi-arrow-left</v-icon><span class="d-none d-sm-inline">Back to Map</span>
-        </v-btn>
-        <h2>{{paddle.name}}</h2>
-      </v-toolbar>
-      <v-row>
-        <v-col cols="12" sm="8" :style="routeMapExpanded ? 'width:100%!important' : ''">
-          <h3>Description</h3>
-          <p>{{paddle.description}}</p>
-          <h3>Difficulty</h3>
-          <p>{{paddle.difficulty}}</p>
-          <h3>Distance</h3>
-          <p>{{paddle.distance}}</p>
-          <p><a target="_blank" :href="drivingDirectionsHref">Driving Directions</a></p>
-          <div class="tags">
-            <v-chip
-              v-for="(tag,index) in paddle.tags"
-              :key="index"
-            >
-              {{tag}}
-            </v-chip>
-          </div>
-        </v-col>
-        <v-col cols="12" sm="4" v-show="!routeMapExpanded">
-          <div class="image-container">
-            <v-img
-              :src="require(`@/dummy/${paddle.imgSrc}`)"
-            ></v-img>
-            <v-icon
-              dark
-              class="toggle-mapsize-icon d-none d-sm-inline"
-              @click="expandRouteMap()"
-              >
-              mdi-arrow-expand
-            </v-icon>
-          </div>
-          <a class="small-map" @click="generateAndExportGPXFile()">Export Route
-            <v-icon color="primary">
+            {{tag}}
+          </v-chip>
+        </div>
+        <div class="actions">
+          <a target="_blank" :href="drivingDirectionsHref">Driving Directions</a>
+          <a @click="generateAndExportGPXFile()">Export Route
+            <!-- <v-icon color="primary">
             mdi-file-export-outline
-            </v-icon>
+            </v-icon> -->
           </a>
-          <a class="small-map" @click="showRouteMapPrintDialog()">Print Route Map
-            <v-icon color="primary">
-            mdi-printer
-            </v-icon>
-          </a>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col cols=12>
-          <v-tabs>
-            <v-tab>Comments</v-tab>
-            <v-tab>Photos</v-tab>
-          </v-tabs>
-        </v-col>
-      </v-row>
-    </v-container>
-  </v-main>
+        </div>
+      </div>
+    </v-card-text>
+
+    <v-tabs v-model="tab">
+      <v-tab>Comments</v-tab>
+    </v-tabs>
+    <v-tabs-items v-model="tab">
+      <v-tab-item
+      >
+      <comments :comments="comments"></comments>
+      </v-tab-item>
+    </v-tabs-items>
+
+    </v-tabs>
+  </v-card>
 </template>
 
 <script>
 
   import {MainMap} from '../utils/mainMap';
-  import {generateStaticMap} from '../utils/generateStaticMap';
-  import geoJson from '../dummy/track.json';
+  import Comments from '../components/Comments.vue'
 
   export default {
     name: 'IndividualView',
+    components: {
+      Comments
+    },
     props: {
       paddle: Object,
       show: Boolean
     },
     mounted() {
-      console.log(this.paddle);
+
     },
     methods: {
-      goBack() {
-        this.routeMapExpanded = false;
-        this.$emit('back',true);
+      close() {
+        this.$emit('close',true);
       },
       generateAndExportGPXFile() {
 
@@ -130,124 +80,66 @@
         document.body.appendChild(link);
         link.click();
         link.remove();
-      },
-      showRouteMapPrintDialog() {
-        let popup;
-        function closePrint () {
-            if ( popup ) {
-                popup.close();
-            }
-        }
-
-        popup = window.open( '/img/route.5d4a6144.png' );
-        popup.onbeforeunload = closePrint;
-        popup.onafterprint = closePrint;
-        popup.focus(); // Required for IE
-        popup.print();
-      },
-      collapseRouteMap() {
-        this.routeMapExpanded = false;
-      },
-      expandRouteMap() {
-        this.routeMapExpanded = true;
-      },
+      }
     },
     computed: {
       drivingDirectionsHref() {
-        return 'https://www.google.com/maps/dir/?api=1&destination=' + this.paddle.launch.coordinates.lat + ',' + this.paddle.launch.coordinates.long;
+        return 'https://www.google.com/maps/dir/?api=1&destination=' + this.paddle.pin[1] + ',' + this.paddle.pin[0];
       },
     },
     data: () => ({
-      routeMap: null,
-      routeMapExpanded: false,
-      mapIsLoaded: false,
-      // paddle: {
-      //   id: 4,
-      //   name: 'Abita river out and back',
-      //   description: 'Peaceful paddle down a winding river free from motorized boats. But then you encounter progressively worse blowdowns until its time to turn back, unless you want to do battle with branches',
-      //   difficulty: 'Medium',
-      //   distance: '6.5 miles',
-      //   launch: {
-      //     notes:'Put in from the grass to the side of the concrete ramp',
-      //     coordinates:{ long:-90.10481683, lat:30.45592972 }
-      //   },
-      //   tags: [
-      //     'Louisiana',
-      //     'Medium Difficulty'
-      //   ],
-      //   imgSrc: 'route.png'
-      // }
+      tab: null,
+      comments: [
+        { text:'The paddle was quite overgrown and hurt my arm.' , user:'Emilie', date:'06/27/1989'},
+        { text:'The paddle was quite overgrown and hurt my arm.' , user:'Emilie', date:'06/27/1989'},
+        { text:'The paddle was quite overgrown and hurt my arm.' , user:'Emilie', date:'06/27/1989'}
+      ]
     }),
   }
 </script>
 
-<style scoped>
-  .map-container {
-    position:relative;
-    margin-bottom:30px;
+<style lang="scss" scoped>
+  .v-application p {
+    margin-bottom:0px;
   }
-  .map-container .v-image {
-    width:100%;
-  }
-  a.small-map {
-    display:block;
-    margin:2.5px 0px;
-    font-size:14px;
-  }
-  a.small-map .v-icon {
-    font-size:20px;
-  }
-  @media (min-width: 1264px) {
-    .container {
-        max-width: 1024px;
+  .tags {
+    margin-top:10px;
+    span {
+      margin-right:10px;
     }
   }
-  .container {
-    background-color:#fff;
-    min-height:100vh;
+  .actions {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    a {
+      color: #A54657;
+      display:block;
+      text-decoration:none;
+      font-size:14px;
+      &:hover {
+        text-decoration:underline;
+      }
+    }
   }
-  /deep/ .v-toolbar__content {
-    justify-content: center;
+  .tags-and-actions {
+    display:flex;
+    justify-content:space-between;
   }
-  .v-chip {
-    margin-right:10px;
+
+   .v-dialog>.v-card> .v-card__text {
+    padding:0px 18px 10px;
   }
-  .image-container {
-    position:relative;
-    margin-bottom:10px;
+   .v-dialog>.v-card> .v-card__title {
+    padding:7px 18px;
   }
-  .image-container .v-icon {
+  ::v-deep .v-tabs-bar {
+    height:30px;
+  }
+  .v-card .icon--close {
     position: absolute;
-    top: 5px;
-    right: 5px;
-  }
-  .toggle-mapsize-icon {
-    background-color:#1976d2!important;
+    right: 10px;
+    top: 12px;
     cursor:pointer;
-  }
-  .map-container .toggle-mapsize-icon {
-    position:absolute;
-    top: 5px;
-    right:5px;
-    z-index:5;
-  }
-  .map-container .btn-container {
-    display: inline-block;
-    position: absolute;
-    z-index: 5;
-    left: 5px;
-    top: 5px;
-  }
-  .map-container .btn-container button {
-      margin-right:5px;
-  }
-  div.tags {
-    margin-top:25px;
-  }
-  .btn-back {
-    position:absolute;
-    left:5px;
-    top: 50%;
-    transform: translate(0,-50%);
   }
 </style>

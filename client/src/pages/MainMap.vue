@@ -1,7 +1,7 @@
 <template>
   <div>
-    <v-dialog v-model="showIndividualView" max-width="350">
-      <individual-view-2 :paddle="paddleClicked" @back="showIndividualView = false"></individual-view-2>
+    <v-dialog v-model="showIndividualView" max-width="500" :hide-overlay="true">
+      <individual-view :paddle="paddleClicked" @close="showIndividualView = false"></individual-view>
     </v-dialog>
     <v-app-bar
       app
@@ -95,7 +95,7 @@
                     :disabled="!aPaddleRouteIsShowing"
                     @click="hideAllRoutes()"
                   ></v-checkbox>
-                  <h4 style="color:#595358;">Paddles</h4>
+                  <h4 style="color:#3E4E50;">Paddles</h4>
                   <!-- <v-icon
                     color="primary">
                     mdi-close-box-outline
@@ -159,13 +159,13 @@
 <script>
   import {MainMap} from '../utils/mainMap';
   import {LouisianaTowns} from '../assets/louisianaTowns.js';
-  import IndividualView2 from '../pages/IndividualView2.vue';
+  import IndividualView from '../pages/IndividualView.vue';
   import NODE_API from '../utils/api';
   import Vue from 'vue';
 
   export default {
     components: {
-      IndividualView2,
+      IndividualView,
     },
     created() {
 
