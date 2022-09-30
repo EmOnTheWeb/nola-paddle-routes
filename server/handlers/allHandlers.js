@@ -7,7 +7,7 @@ async function getRouteNamesAndStartCoordinates(req,res) {
 
   const db = dbo.getDb();
   const paddlesCollection = db.collection('paddles');
-  let cursor = await paddlesCollection.find({});
+  let cursor = await paddlesCollection.find({}).sort({'name':1});
 
   let routeNamesAndStartCoordinates = [];
   while (await cursor.hasNext()) {
@@ -74,7 +74,7 @@ function importRawData(req,res) {
       if (count === 0) {
 
         let paddle = {
-          name: routeName,
+          // name: routeName,
           route: theCoords
         };
 

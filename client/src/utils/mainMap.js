@@ -16,6 +16,8 @@ export class MainMap {
       center: this.originalCoords,
       zoom: 8,
       });
+
+    this.map.addControl(new mapboxgl.ScaleControl({unit:'imperial', position: 'top-right'}));
   }
 
   centerOnLocation(locationCoords) {
