@@ -14,7 +14,7 @@ export class MainMap {
       // Choose from Mapbox's core styles, or make your own style with Mapbox Studio
       style: 'mapbox://styles/mapbox/outdoors-v11',
       center: this.originalCoords,
-      zoom: 6,
+      zoom: 8,
       });
   }
 
