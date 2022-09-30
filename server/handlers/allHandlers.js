@@ -57,7 +57,19 @@ function importRawData(req,res) {
         theCoords = theRouteObj.geometry.coordinates;
       }
 
-      let count = paddlesCollection.countDocuments({ name: routeName })
+      if (ext === 'gpx') {
+        let filePath = rawDataDir + '/' + file;
+        let theGpx = new DOMParser().parseFromString(fs.readFileSync(filePath, 'utf8'));
+        //seems like the first <name> tag holds the route name
+        routeName = theGpx.getElementsByTagName("name")[0].childNodes[0].nodeValue;
+        let theGeoJson = tj.gpx(theGpx);
+        let theRouteObj = theGeoJson.features.find((feature) => {
+          return feature.geometry.type == "LineString";
+        });
+        theCoords = theRouteObj.geometry.coordinates;
+      }
+
+      let count = await paddlesCollection.countDocuments({ name: routeName })
 
       if (count === 0) {
 
@@ -69,6 +81,7 @@ function importRawData(req,res) {
         await paddlesCollection.insertOne(
           paddle
         );
+
       }
     });
   });
