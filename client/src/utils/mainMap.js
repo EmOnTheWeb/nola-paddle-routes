@@ -4,7 +4,7 @@ export class MainMap {
   constructor() {
     this.map = {};
     this.markers = [];
-    this.originalCoords = [-89.4077829,30.2988043]; // starting position [lng, lat]
+    this.originalCoords = [-90.1089,29.9520]; // starting position [lng, lat]
   }
 
   async initMap() {
