@@ -7,20 +7,51 @@ async function getRouteNamesAndStartCoordinates(req,res) {
 
   const db = dbo.getDb();
   const paddlesCollection = db.collection('paddles');
-  let cursor = await paddlesCollection.find({}).sort({'name':1});
+  let array = await paddlesCollection.find({}).sort({'name':1}).toArray();
 
   let routeNamesAndStartCoordinates = [];
-  while (await cursor.hasNext()) {
-    let doc = await cursor.next();
-    let startCoord = doc.route[0];
-    routeNamesAndStartCoordinates.push(
-      {
-        'id':doc._id,
-        'name':doc.name,
-        'pin':startCoord,
-        'route':doc.route
+
+  let length = array.length;
+  let multiPaddleDocs = [];
+  for (let i = 0; i < length; i++) {
+    let doc = array[i];
+    if (doc.multi && doc.idParent) {
+      multiPaddleDocs.push({
+        'id':doc._id.toString(),
+        'route':doc.route,
+        'idParent':doc.idParent
+      });
+    } else {
+      let startCoord = doc.route[0];
+      routeNamesAndStartCoordinates.push(
+        {
+          'id':doc._id.toString(),
+          'name':doc.name,
+          'pin':startCoord,
+          'route':doc.route
+        }
+      );
+    }
+  }
+
+  function findAndConcatChildRoute(topLevelDoc, parent = null) {
+    let child = multiPaddleDocs.find((doc) => doc.idParent == parent.id.toString());
+    if (!child) {
+      return;
+    }
+    topLevelDoc.route = topLevelDoc.route.concat(child.route);
+    findAndConcatChildRoute(topLevelDoc,child);
+  }
+
+  if (multiPaddleDocs.length) {
+    for (let i = 0; i < array.length; i++) {
+      if (array[i].multi && !array[i].idParent) {
+        //get corresponding in routeNamesAndStartCoordinates
+        let parentPaddleIndex = routeNamesAndStartCoordinates.findIndex((p) => p.id.toString() === array[i]._id.toString());
+        let topLevelDoc = routeNamesAndStartCoordinates[parentPaddleIndex];
+        findAndConcatChildRoute(topLevelDoc,topLevelDoc);
       }
-    )
+    }
   }
 
   res.send(JSON.stringify(routeNamesAndStartCoordinates));
