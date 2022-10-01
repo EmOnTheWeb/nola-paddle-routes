@@ -9,48 +9,47 @@ async function getRouteNamesAndStartCoordinates(req,res) {
   const paddlesCollection = db.collection('paddles');
   let array = await paddlesCollection.find({}).sort({'name':1}).toArray();
 
-  let routeNamesAndStartCoordinates = [];
+  let childRoutes = array.filter((d) => d.multi && d.idParent)
+                         .map((d) => {
+                            let childDocToObj = {
+                                'id':d._id.toString(),
+                                'route':d.route,
+                                'idParent':d.idParent
+                                };
+                            return childDocToObj;
+                         });
 
+   function findAndConcatChildRoute(topLevelRouteObj, parent = null) {
+     let child = childRoutes.find((doc) => doc.idParent == parent.id.toString());
+     if (!child) {
+       return;
+     }
+     topLevelRouteObj.route = topLevelRouteObj.route.concat(child.route);
+     findAndConcatChildRoute(topLevelRouteObj,child);
+   }
+
+  let routeNamesAndStartCoordinates = [];
   let length = array.length;
-  let multiPaddleDocs = [];
   for (let i = 0; i < length; i++) {
     let doc = array[i];
     if (doc.multi && doc.idParent) {
-      multiPaddleDocs.push({
-        'id':doc._id.toString(),
-        'route':doc.route,
-        'idParent':doc.idParent
-      });
+      //these are in the childRoutes array
     } else {
       let startCoord = doc.route[0];
-      routeNamesAndStartCoordinates.push(
-        {
+      let coordObj = {
           'id':doc._id.toString(),
           'name':doc.name,
           'pin':startCoord,
           'route':doc.route
         }
-      );
-    }
-  }
 
-  function findAndConcatChildRoute(topLevelDoc, parent = null) {
-    let child = multiPaddleDocs.find((doc) => doc.idParent == parent.id.toString());
-    if (!child) {
-      return;
-    }
-    topLevelDoc.route = topLevelDoc.route.concat(child.route);
-    findAndConcatChildRoute(topLevelDoc,child);
-  }
-
-  if (multiPaddleDocs.length) {
-    for (let i = 0; i < array.length; i++) {
-      if (array[i].multi && !array[i].idParent) {
-        //get corresponding in routeNamesAndStartCoordinates
-        let parentPaddleIndex = routeNamesAndStartCoordinates.findIndex((p) => p.id.toString() === array[i]._id.toString());
-        let topLevelDoc = routeNamesAndStartCoordinates[parentPaddleIndex];
-        findAndConcatChildRoute(topLevelDoc,topLevelDoc);
+      if (doc.multi) {
+        //this is top level of a multi route
+        findAndConcatChildRoute(coordObj,coordObj);
       }
+      routeNamesAndStartCoordinates.push(
+        coordObj
+      );
     }
   }
 
