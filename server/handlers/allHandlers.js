@@ -14,7 +14,9 @@ async function getRouteNamesAndStartCoordinates(req,res) {
                             let childDocToObj = {
                                 'id':d._id.toString(),
                                 'route':d.route,
-                                'idParent':d.idParent
+                                'idParent':d.idParent,
+                                'tags':d.tags,
+                                'description':d.description
                                 };
                             return childDocToObj;
                          });
@@ -40,7 +42,9 @@ async function getRouteNamesAndStartCoordinates(req,res) {
           'id':doc._id.toString(),
           'name':doc.name,
           'pin':startCoord,
-          'route':doc.route
+          'route':doc.route,
+          'tags':doc.tags,
+          'description':doc.description
         }
 
       if (doc.multi) {

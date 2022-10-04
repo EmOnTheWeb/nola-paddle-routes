@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-dialog v-model="showIndividualView" max-width="500" :hide-overlay="true">
+    <v-dialog v-model="showIndividualView" max-width="600" :hide-overlay="true">
       <individual-view :paddle="paddleClicked" @close="showIndividualView = false"></individual-view>
     </v-dialog>
     <v-app-bar
@@ -9,7 +9,8 @@
       flat
     >
       <v-container fluid class="pa-0 fill-height">
-        <v-col cols="2" class="d-none d-sm-flex">
+        <v-col cols="2" class="d-none d-sm-flex" style="flex-wrap:wrap; ">
+
         </v-col>
         <v-col cols="10" >
           <v-row class="toolbar-row">
@@ -35,48 +36,88 @@
                     {{ data.item.name }}, {{ data.item.adminCode }}
                 </template>
               </v-autocomplete>
-              <v-btn
-                outlined
-                small
-                color="primary"
-                @click="useCurrentLocation()"
-                title="Get your location to use in the search bar"
-              >
-                <!-- <span class="d-none d-sm-inline">use my location</span> -->
-                <v-icon
-                  dark
-                  v-show="!isGettingLocation"
-                  >
-                  mdi-crosshairs-gps
-                </v-icon>
-                <v-progress-circular
-                   v-show="isGettingLocation"
-                   indeterminate
-                   size="18"
-                   width="2"
-                 ></v-progress-circular>
-              </v-btn>
 
-            <div style="min-width:250px;" class="ml-3">
-              <span style="font-size: 0.8rem;width: 105px;line-height:1;">
-                Show results within <span style="font-size:1.2rem;">{{resultsWithinDistance}}</span> miles
-              </span>
+              <v-menu
+               open-on-hover
+               bottom
+             >
+               <template v-slot:activator="{ on, attrs }">
+                 <v-icon
+                 v-bind="attrs"
+          v-on="on"
+                   color="accent"
+                   >
+                  mdi-filter-variant
+                 </v-icon>
+               </template>
 
-              <v-slider
-               v-model="resultsWithinDistance"
-               step="10"
-               ticks
-               tick-size="2"
-               height="10"
-                max="300"
-                min="0"
-                @input="hideShowMarkers"
-              ></v-slider>
+               <v-btn
+                 outlined
+                 small
+                 color="primary"
+                 @click="useCurrentLocation()"
+                 title="Get your location to use in the search bar"
+               >
+                 <!-- <span class="d-none d-sm-inline">use my location</span> -->
+                 <v-icon
+                   dark
+                   v-show="!isGettingLocation"
+                   >
+                   mdi-crosshairs-gps
+                 </v-icon>
+                 <v-progress-circular
+                    v-show="isGettingLocation"
+                    indeterminate
+                    size="18"
+                    width="2"
+                  ></v-progress-circular>
+               </v-btn>
+
+             <div style="min-width:175px;">
+               <span style="font-size: 0.8rem;width: 105px;line-height:1;">
+                 Show results within <span style="font-size:1.2rem;">{{resultsWithinDistance}}</span> miles
+               </span>
+
+               <v-slider
+                v-model="resultsWithinDistance"
+                step="10"
+                ticks
+                tick-size="2"
+                height="10"
+                 max="300"
+                 min="0"
+                 @input="hideShowMarkers"
+               ></v-slider>
+             </div>
+             </v-menu>
+
+
+
+
+
+            <!-- <v-select
+              v-model="distanceRange"
+              :items="this.distanceRanges"
+              chips
+              filled
+              dense
+              label="Distance"
+            ></v-select> -->
+            <v-select
+              v-model="type"
+              :items="this.types"
+              chips
+              filled
+              dense
+              label="Type"
+            ></v-select>
+            <v-spacer></v-spacer>
+            <div class="login-btns">
+              <v-btn small depressed class="accent--text">Sign In</v-btn>
+              <v-btn small depressed color="accent">Sign Up</v-btn>
             </div>
           </v-row>
-          <v-row class="toolbar-row">
 
-          </v-row>
         </v-col>
 
       </v-container>
@@ -126,6 +167,7 @@
               </v-list>
             </v-sheet>
           </v-col>
+
           <v-col cols="12" sm="10" class="pr-0 pl-0 pt-0 pb-0">
             <v-sheet
               height="calc(100vh - 52px)"
@@ -426,6 +468,10 @@
       }
     },
     data: () => ({
+      // distanceRange: '',
+      // distanceRanges: [],
+      type: '',
+      types: [],
       isGettingLocation: false,
       resultsWithinDistance: 100,
       componentHasMounted: false,
@@ -554,5 +600,12 @@
     cursor: pointer;
     margin-left:-10px;
     margin-top:4px;
+  }
+  .login-btns {
+    border-left:1px solid var(--v-primary-lighten5);
+    padding:0px 10px;
+    > :first-child {
+      margin-right:10px;
+    }
   }
 </style>

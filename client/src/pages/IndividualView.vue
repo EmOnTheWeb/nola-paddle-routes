@@ -1,19 +1,12 @@
 <template>
   <v-card>
     <v-card-title>{{paddle.name}}</v-card-title>
-    <v-icon class="icon--close" color="primary" @click="close()">mdi-close</v-icon>
+    <v-icon color="accent" class="icon--close" @click="close()">mdi-close</v-icon>
     <v-card-text>
-      <p>the description</p>
-      <p>the distance</p>
-      <p>boat launch type</p>
-      <div class="tags-and-actions">
-        <div class="tags">
-          <v-chip
-            v-for="(tag,index) in ['hard','open water']"
-            :key="index"
-          >
-            {{tag}}
-          </v-chip>
+      <div class="info-and-actions">
+        <div>
+          <p><span style="font-weight:bold;margin-right:5px;">Distance:</span>the distance</p>
+          <p><span style="font-weight:bold;margin-right:5px;">Boat Launch Type:</span>blt</p>
         </div>
         <div class="actions">
           <a target="_blank" :href="drivingDirectionsHref">Driving Directions</a>
@@ -24,6 +17,18 @@
           </a>
         </div>
       </div>
+      <p>{{paddle.description}}</p>
+
+        <div class="tags">
+          <v-chip
+            v-for="(tag,index) in paddle.tags"
+            :key="index"
+          >
+            {{tag}}
+          </v-chip>
+        </div>
+
+
     </v-card-text>
 
     <v-tabs v-model="tab">
@@ -90,9 +95,9 @@
     data: () => ({
       tab: null,
       comments: [
-        { text:'The paddle was quite overgrown and hurt my arm.' , user:'Emilie', date:'06/27/1989'},
-        { text:'The paddle was quite overgrown and hurt my arm.' , user:'Emilie', date:'06/27/1989'},
-        { text:'The paddle was quite overgrown and hurt my arm.' , user:'Emilie', date:'06/27/1989'}
+        // { text:'The paddle was quite overgrown and hurt my arm.' , user:'Emilie', date:'06/27/1989'},
+        // { text:'The paddle was quite overgrown and hurt my arm.' , user:'Emilie', date:'06/27/1989'},
+        // { text:'The paddle was quite overgrown and hurt my arm.' , user:'Emilie', date:'06/27/1989'}
       ]
     }),
   }
@@ -104,6 +109,7 @@
   }
   .tags {
     margin-top:10px;
+
     span {
       margin-right:10px;
     }
@@ -113,28 +119,53 @@
     flex-direction: column;
     justify-content: flex-end;
     a {
-      color: #A54657;
       display:block;
       text-decoration:none;
       font-size:14px;
-      &:hover {
-        text-decoration:underline;
-      }
+      color: var(--v-primary--base);
     }
   }
-  .tags-and-actions {
+  .info-and-actions {
     display:flex;
     justify-content:space-between;
+    margin-top:5px; margin-bottom:5px;
+    .actions {
+      padding: 5px;
+      border: 2px solid var(--v-warning-base);
+      border-radius: 10px;
+      font-weight:bold;
+    }
   }
-
+  .v-application .v-card {
+    color: var(--v-primary--base);
+  }
    .v-dialog>.v-card> .v-card__text {
     padding:0px 18px 10px;
+    color: var(--v-primary--base);
   }
    .v-dialog>.v-card> .v-card__title {
     padding:7px 18px;
+    color: var(--v-primary--base);
   }
   ::v-deep .v-tabs-bar {
     height:30px;
+  }
+  ::v-deep.v-tabs-items {
+    padding: 0px 15px;
+  }
+  .v-tabs {
+    margin-top: 20px;
+    padding:0px 15px;
+    .v-tab {
+      background-color: white;
+      border: 2px solid black;
+      border-bottom: 0px;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+  }
+  ::v-deep .v-tabs-slider-wrapper {
+    display:none;
   }
   .v-card .icon--close {
     position: absolute;

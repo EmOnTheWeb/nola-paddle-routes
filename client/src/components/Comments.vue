@@ -1,17 +1,20 @@
 <template>
   <v-list>
-    <v-textarea
-     filled
-     auto-grow
-     placeholder="Leave a comment. Include any notes about conditions."
-     rows="2"
-     row-height="20"
-     hide-details
-    ></v-textarea>
-    <v-btn color="accent" depressed small>Comment</v-btn>
+    <div class="comment-input-container">
+      <v-textarea
+       v-model="comment"
+       filled
+       auto-grow
+       placeholder="Leave a comment. Include any notes about conditions."
+       rows="2"
+       row-height="20"
+       hide-details
+      ></v-textarea>
+      <v-icon v-show="thereIsAComment" color="accent">mdi-send</v-icon>
+    </div>
     <v-list-item
       v-for="(comment, index) in comments"
-      two-line
+      three-line
       :key="index"
     >
       <v-list-item-content>
@@ -31,11 +34,20 @@ export default {
   props: {
     comments: []
   },
+  mounted() {
+
+  },
   data() {
     return {
-      count: 0
+      count: 0,
+      comment: ''
     }
-  }
+  },
+  computed: {
+    thereIsAComment() {
+      return this.comment.trim() !== '';
+    },
+  },
 }
 </script>
 
@@ -70,6 +82,15 @@ export default {
         border-width:0px;
     }
   .v-tabs-items .v-sheet {
-    padding-top:0px; 
+    padding-top:0px;
   }
+  .comment-input-container {
+    position:relative;
+    .v-icon {
+      position: absolute;
+      right: 5px;
+      bottom: 5px;
+    }
+  }
+
 </style>
