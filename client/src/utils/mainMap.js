@@ -1,4 +1,7 @@
 const API_KEY = process.env.VUE_APP_API_KEY;
+const COLOR_SHORT = '#00AF54'; //< 6 miles
+const COLOR_MEDIUM = '#FFC53A'; // >= 6miles <= 11
+const COLOR_LONG = '#df323b'; // > 11miles
 
 export class MainMap {
   constructor() {
@@ -98,9 +101,20 @@ export class MainMap {
 
       let features = idPaddlesToShow.map((id) => {
         let thePaddle = paddleData.find((e) => e.id === id);
+
+        let color;
+        let distance = Number(thePaddle.distance);
+        if (distance < 6 ) {
+          color = COLOR_SHORT;
+        } else if ( distance <= 11 ) {
+          color = COLOR_MEDIUM;
+        } else {
+          color = COLOR_LONG;
+        }
+
         return {
           'type': 'Feature',
-          'properties': { 'name': thePaddle.name },
+          'properties': { 'name': thePaddle.name, color: color },
           'geometry': {
             'type': 'LineString',
             'coordinates': thePaddle.route
@@ -117,9 +131,19 @@ export class MainMap {
       //otherwise add the source with the route
       let thePaddle = paddleData.find((e) => e.id === idPaddlesToShow[0]);
 
+      let color;
+      let distance = Number(thePaddle.distance);
+      if (distance < 6 ) {
+        color = COLOR_SHORT;
+      } else if ( distance < 10 ) {
+        color = COLOR_MEDIUM;
+      } else {
+        color = COLOR_LONG;
+      }
+
       let feature = {
         'type': 'Feature',
-        'properties': { 'name': thePaddle.name },
+        'properties': { 'name': thePaddle.name, 'color':color},
         'geometry': {
           'type': 'LineString',
           'coordinates': thePaddle.route
@@ -140,8 +164,8 @@ export class MainMap {
         'type': 'line',
         'source': 'routes',
         'paint': {
-        'line-color': '#ef6c00',
-        'line-width': 6
+        'line-width': 6,
+        'line-color': ['get', 'color']
         }
       });
 

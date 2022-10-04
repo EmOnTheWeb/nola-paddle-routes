@@ -136,7 +136,7 @@
                 <v-list-item class="mb-1">
                   <v-checkbox dense hide-details
                     v-model="aPaddleRouteIsShowing"
-                    color="orange darken-3"
+                    color="accent lighten-1"
                     :disabled="!aPaddleRouteIsShowing"
                     @click="hideAllRoutes()"
                   ></v-checkbox>
@@ -158,7 +158,7 @@
                     v-model="paddleRoutesShowing[paddle.id]"
                     dense
                     hide-details
-                    color="orange darken-3"
+                    color="accent lighten-1"
                     style="pointer-events:none;"
                   >
                   </v-checkbox>
@@ -181,7 +181,7 @@
               <v-progress-circular
                  v-if="!mapMarkersAdded"
                  indeterminate
-                 color="warning"
+                 color="accent"
                  class="map-loading-spinner"
               ></v-progress-circular>
               <v-btn class="map-icon zoom-in" small depressed
@@ -189,7 +189,7 @@
                 title="Zoom in">
                 <v-icon
                   dark
-                  color="primary">
+                  color="accent">
                   mdi-plus-thick
                 </v-icon>
               </v-btn>
@@ -198,7 +198,7 @@
                 title="Zoom out">
                 <v-icon
                   dark
-                  color="primary">
+                  color="accent">
                   mdi-minus-thick
                 </v-icon>
               </v-btn>
@@ -206,7 +206,7 @@
                 title="Print">
                 <v-icon
                   dark
-                  color="primary">
+                  color="accent">
                   mdi-printer
                 </v-icon>
               </v-btn>
@@ -216,7 +216,7 @@
                 title="Zoom out to map's original position">
                 <v-icon
                   dark
-                  color="primary">
+                  color="accent">
                   mdi-magnify-minus-cursor
                 </v-icon>
               </v-btn>
@@ -513,7 +513,7 @@
   }
   .v-list-item__title {
     font-size: 0.85rem;
-    font-weight:500; 
+    font-weight:500;
   }
   #map {
     position:absolute;

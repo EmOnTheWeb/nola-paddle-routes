@@ -131,7 +131,7 @@
     margin-top:5px; margin-bottom:5px;
     .actions {
       padding: 5px;
-      border: 2px solid var(--v-warning-base);
+      border: 2px solid var(--v-accent-lighten1);
       border-radius: 10px;
       font-weight:bold;
     }
