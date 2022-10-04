@@ -14,53 +14,44 @@
         </v-col>
         <v-col cols="10" >
           <v-row class="toolbar-row">
-              <v-autocomplete
-                v-model="select"
-                @change="hideShowMarkers()"
-                :items="items"
-                item-text="name"
-                item-value="location"
-                cache-items
-                class="mr-2 mb-0 mr-sm-2"
-                flat
-                hide-no-data
-                hide-details
-                label="Location"
-                solo-inverted
-                min-height="28"
-              >
-                <template v-slot:selection="data">
-                  {{data.item.name}}, {{data.item.adminCode}}
-                </template>
-                <template v-slot:item="data">
-                    {{ data.item.name }}, {{ data.item.adminCode }}
-                </template>
-              </v-autocomplete>
-
-              <v-menu
-               open-on-hover
-               bottom
-             >
-               <template v-slot:activator="{ on, attrs }">
-                 <v-icon
-                 v-bind="attrs"
-          v-on="on"
-                   color="accent"
-                   >
-                  mdi-filter-variant
-                 </v-icon>
-               </template>
-
-               <v-btn
-                 outlined
+              <section class="filter--location">
+                <v-autocomplete
+                  v-model="select"
+                  @change="hideShowMarkers()"
+                  :items="items"
+                  item-text="name"
+                  item-value="location"
+                  cache-items
+                  class="mr-2 mb-0 mr-sm-2"
+                  flat
+                  dense
+                  hide-no-data
+                  hide-details
+                  outlined
+                  label="Location"
+                  solo-inverted
+                  min-height="28"
+                >
+                  <template v-slot:selection="data">
+                    {{data.item.name}}, {{data.item.adminCode}}
+                    <span style="font-size:0.8rem;position:absolute;right:30px;" v-if="data">&nbsp;&nbsp;(within {{resultsWithinDistance}} miles)</span>
+                  </template>
+                  <template v-slot:item="data">
+                      {{ data.item.name }}, {{ data.item.adminCode }}
+                  </template>
+                </v-autocomplete>
+                <v-btn
+                 class="icon-btn-locate"
                  small
-                 color="primary"
+                 color="transparent"
+                 depressed
                  @click="useCurrentLocation()"
                  title="Get your location to use in the search bar"
-               >
+                 >
                  <!-- <span class="d-none d-sm-inline">use my location</span> -->
                  <v-icon
                    dark
+                   color="accent"
                    v-show="!isGettingLocation"
                    >
                    mdi-crosshairs-gps
@@ -70,48 +61,61 @@
                     indeterminate
                     size="18"
                     width="2"
+                    color="accent"
                   ></v-progress-circular>
                </v-btn>
 
-             <div style="min-width:175px;">
-               <span style="font-size: 0.8rem;width: 105px;line-height:1;">
-                 Show results within <span style="font-size:1.2rem;">{{resultsWithinDistance}}</span> miles
-               </span>
 
-               <v-slider
-                v-model="resultsWithinDistance"
-                step="10"
-                ticks
-                tick-size="2"
-                height="10"
-                 max="300"
-                 min="0"
-                 @input="hideShowMarkers"
-               ></v-slider>
-             </div>
-             </v-menu>
-
+               <v-menu
+               bottom
+               left
+               offset-y
+              :close-on-content-click="false"
+               >
+               <template v-slot:activator="{ on, attrs }">
+                 <v-icon
+                  v-bind="attrs"
+                  v-on="on"
+                  color="accent"
+                  style="cursor:pointer;">
+                  mdi-filter-variant
+                 </v-icon>
+               </template>
 
 
+               <div class="filter--location__slider">
+                 <span style="font-size: 0.8rem;width: 105px;line-height:1;">
+                   Show results within <span class="results-within-number">{{resultsWithinDistance}}</span> miles
+                 </span>
 
+                 <v-slider
+                  v-model="resultsWithinDistance"
+                  step="10"
+                  ticks
+                  tick-size="2"
+                  color="accent"
+                  height="25"
+                   max="300"
+                   min="0"
+                   @input="hideShowMarkers"
+                 ></v-slider>
+               </div>
+               </v-menu>
+            </section>
+            <section class="filter--tags">
+              <v-select
+                v-model="type"
+                :items="this.types"
+                filled
+                outlined
+                multiple
+                chips
+                dense
+                hide-details
+                label="Paddle Type"
+              ></v-select>
+            </section>
 
-            <!-- <v-select
-              v-model="distanceRange"
-              :items="this.distanceRanges"
-              chips
-              filled
-              dense
-              label="Distance"
-            ></v-select> -->
-            <v-select
-              v-model="type"
-              :items="this.types"
-              chips
-              filled
-              dense
-              label="Type"
-            ></v-select>
-            <v-spacer></v-spacer>
             <div class="login-btns">
               <v-btn small depressed class="accent--text">Sign In</v-btn>
               <v-btn small depressed color="accent">Sign Up</v-btn>
@@ -136,7 +140,7 @@
                     :disabled="!aPaddleRouteIsShowing"
                     @click="hideAllRoutes()"
                   ></v-checkbox>
-                  <h4 style="color:#3E4E50;">Paddles</h4>
+                  <h4 style="font-weight:500;">Paddles</h4>
                   <!-- <v-icon
                     color="primary">
                     mdi-close-box-outline
@@ -230,6 +234,8 @@
   import IndividualView from '../pages/IndividualView.vue';
   import NODE_API from '../utils/api';
   import Vue from 'vue';
+  // import length from '@turf/length';
+  // import * as helpers from '@turf/helpers';
 
   export default {
     components: {
@@ -239,6 +245,15 @@
 
       NODE_API.get('/getMapPins').then(response => {
         this.paddles = response.data;
+
+        // this.paddles.forEach((p) => {
+        //   var line = helpers.lineString(p.route);
+        //   let theLength = length(line, {units: 'miles'});
+        //
+        //   console.log('NAME:',p.name);
+        //   console.log('LENGTH',theLength);
+        //   console.log('.....................');
+        // });
       })
       .catch(error => {
         console.log(error);
@@ -471,9 +486,9 @@
       // distanceRange: '',
       // distanceRanges: [],
       type: '',
-      types: [],
+      types: ['Bayou','River','Open Water'],
       isGettingLocation: false,
-      resultsWithinDistance: 100,
+      resultsWithinDistance: 300,
       componentHasMounted: false,
       paddles: [],
       select: null,
@@ -498,6 +513,7 @@
   }
   .v-list-item__title {
     font-size: 0.85rem;
+    font-weight:500; 
   }
   #map {
     position:absolute;
@@ -508,6 +524,7 @@
   }
   .toolbar-row {
     align-items:center;
+    justify-content:space-between;
     & + .toolbar-row {
       padding-top:2px;
     }
@@ -570,22 +587,62 @@
       left:5px;
     }
   }
-  ::v-deep .v-text-field.v-autocomplete .v-input__control,
-  .v-sheet.v-select-list ::v-deep .v-list-item {
-    min-height:30px!important;
+  .theme--light.v-icon:focus:after {
+    opacity:0;
   }
-
+  // ::v-deep .v-text-field.v-autocomplete .v-input__control,
+  // .v-sheet.v-select-list ::v-deep .v-list-item,
+  // .v-text-field.v-text-field--enclosed:not(.v-text-field--rounded)>.v-input__control>.v-input__slot {
+  //   min-height:30px!important;
+  // }
+  // ::v-deep .v-text-field--filled>.v-input__control>.v-input__slot,
+  // ::v-deep .v-text-field--full-width>.v-input__control>.v-input__slot,
+  // ::v-deep .v-text-field--outlined>.v-input__control>.v-input__slot {
+  //   min-height:30px !important;
+  // }
+  //
+  // .v-select.v-select--chips:not(.v-text-field--single-line).v-text-field--box ::v-deep .v-select__selections,
+  // .v-select.v-select--chips:not(.v-text-field--single-line).v-text-field--enclosed ::v-deep .v-select__selections {
+  //   min-height:30px!important;
+  // }
+  .filter--location {
+    width:350px;
+    position:relative;
+    display:flex;
+    flex-direction:row;
+    .icon-btn-locate {
+      position:absolute;
+      top:7px;
+      left:3px;
+    }
+  }
+  .filter--location__slider {
+    padding: 20px;
+    background-color: white;
+    width:225px;
+  }
+  .filter--tags {
+    width:300px;
+  }
+  .v-autocomplete ::v-deep .v-select__slot{
+    padding-left:25px;
+    label {
+      left:25px !important;
+    }
+  }
   .v-autocomplete {
     & + button.v-size--small {
       padding-left: 0px;
       padding-right: 0px;
       min-width: 30px;
       i { font-size:19px; }
+      &:hover.theme--light.v-btn {
+        color:transparent;
+      }
     }
     max-width:400px;
 
   }
-
   .v-input--hide-details.v-input--checkbox {
     margin-top:0px; padding-top:0px;
   }
@@ -607,5 +664,13 @@
     > :first-child {
       margin-right:10px;
     }
+  }
+  ::v-deep .mdi-menu-down.v-icon.theme--light   {
+    color:var(--v-accent-base);
+  }
+  .results-within-number {
+    font-size:1.2rem;
+    color:var(--v-accent-base);
+    font-weight:500
   }
 </style>

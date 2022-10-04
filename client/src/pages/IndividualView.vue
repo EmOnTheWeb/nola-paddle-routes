@@ -5,16 +5,16 @@
     <v-card-text>
       <div class="info-and-actions">
         <div>
-          <p><span style="font-weight:bold;margin-right:5px;">Distance:</span>the distance</p>
+          <p><span style="font-weight:bold;margin-right:5px;">Distance:</span>{{paddle.distance}}&nbsp;miles</p>
           <p><span style="font-weight:bold;margin-right:5px;">Boat Launch Type:</span>blt</p>
         </div>
         <div class="actions">
-          <a target="_blank" :href="drivingDirectionsHref">Driving Directions</a>
           <a @click="generateAndExportGPXFile()">Export Route
             <!-- <v-icon color="primary">
             mdi-file-export-outline
             </v-icon> -->
           </a>
+          <a target="_blank" :href="drivingDirectionsHref">Driving Directions</a>
         </div>
       </div>
       <p>{{paddle.description}}</p>

@@ -41,6 +41,7 @@ async function getRouteNamesAndStartCoordinates(req,res) {
       let coordObj = {
           'id':doc._id.toString(),
           'name':doc.name,
+          'distance':doc.distance,
           'pin':startCoord,
           'route':doc.route,
           'tags':doc.tags,
