@@ -1,55 +1,117 @@
 <template>
-  <v-card>
-    <v-card-title>Sign in</v-card-title>
-    <v-icon color="accent" class="icon--close" @click="close()">mdi-close</v-icon>
-    <v-card-text>
-      <v-form v-model="valid" lazy-validation>
-        <div id="g-btn-div"></div>
-        <div style="text-align:center;margin:13px 0px;"> or </div>
+  <div>
+    <v-card v-show="!showSignUp">
+      <v-card-title>Sign in</v-card-title>
+      <v-icon color="accent" class="icon--close" @click="close()">mdi-close</v-icon>
+      <v-card-text>
+        <v-form v-model="valid" lazy-validation>
+          <div id="g-btn-div"></div>
+          <div style="text-align:center;margin:13px 0px;"> or </div>
 
-        <v-text-field
-          v-model="email"
-          :rules="emailRules"
-          label="E-mail"
-          class="mb-2"
-          required
-          filled
-          outlined
-          dense
-          hide-details
-        ></v-text-field>
+          <v-text-field
+            v-model="email"
+            :rules="emailRules"
+            label="E-mail"
+            class="mb-2"
+            required
+            filled
+            outlined
+            dense
+            hide-details
+          ></v-text-field>
 
-        <v-text-field
-          v-model="password"
-          label="Password"
-          class="mb-2"
-          required
-          filled
-          outlined
-          dense
-          hide-details
-        ></v-text-field>
-        <v-btn
-         class="mb-1"
-         :disabled="!valid"
-         color="accent"
-         block
-        >
-        Sign In
-        </v-btn>
-        <p><a style="font-size:0.75rem;">Forgot your password?</a></p>
-        <section class="footer">
-          <p>Don't have an account?<a>&nbsp;Sign Up</a></p>
-        </section>
-      </v-form>
-    </v-card-text>
-  </v-card>
-  <!-- <v-card v-show>
-    <v-progress-circular
-       indeterminate
-       color="accent"
-    ></v-progress-circular>
-  </v-card> -->
+          <v-text-field
+            v-model="password"
+            label="Password"
+            class="mb-2"
+            required
+            filled
+            outlined
+            dense
+            hide-details
+          ></v-text-field>
+          <v-btn
+           class="mb-1"
+           :disabled="!valid"
+           color="accent"
+           block
+          >
+          Sign In
+          </v-btn>
+          <p><a style="font-size:0.75rem;">Forgot your password?</a></p>
+          <section class="footer">
+            <p>Don't have an account?<a @click="showSignUp = true">&nbsp;Sign Up</a></p>
+          </section>
+        </v-form>
+      </v-card-text>
+    </v-card>
+    <v-card v-show="showSignUp">
+      <v-card-title>Sign up</v-card-title>
+      <v-icon color="accent" class="icon--close" @click="close()">mdi-close</v-icon>
+      <v-card-text>
+        <v-form v-model="valid" lazy-validation>
+          <div id="g-btn-div2"></div>
+          <div style="text-align:center;margin:13px 0px;"> or </div>
+          <v-text-field
+            v-model="signupUsername"
+            label="Username"
+            class="mb-2"
+            required
+            filled
+            outlined
+            dense
+            hide-details
+          ></v-text-field>
+
+          <v-text-field
+            v-model="signupEmail"
+            :rules="emailRules"
+            label="E-mail"
+            class="mb-2"
+            required
+            filled
+            outlined
+            dense
+            hide-details
+          ></v-text-field>
+
+          <v-text-field
+            v-model="signupPassword"
+            label="Password"
+            class="mb-2"
+            required
+            filled
+            outlined
+            dense
+            hide-details
+          ></v-text-field>
+
+          <v-text-field
+            v-model="signupConfirmPassword"
+            label="Password"
+            class="mb-2"
+            required
+            filled
+            outlined
+            dense
+            hide-details
+          ></v-text-field>
+
+          <v-btn
+           class="mb-1"
+           :disabled="!signupValid"
+           color="accent"
+           block
+          >
+          Sign Up
+          </v-btn>
+          <section class="footer">
+            <p>Already have an account?<a @click="showSignUp = false">&nbsp;Sign In</a></p>
+          </section>
+        </v-form>
+      </v-card-text>
+    </v-card>
+  </div>
 </template>
 
 <script>
@@ -67,7 +129,11 @@
       });
       google.accounts.id.renderButton(
         document.getElementById("g-btn-div"),
-        { theme: "outline", width: "300"}  // customization attributes
+        { theme: "outline", width:"318"}  // customization attributes
+      );
+      google.accounts.id.renderButton(
+        document.getElementById("g-btn-div2"),
+        { theme: "outline", text: "signup_with"}  // customization attributes
       );
     },
     methods: {
@@ -83,17 +149,18 @@
     },
     data: () => ({
       valid: false,
-      // username: '',
-      // nameRules: [
-      //   v => !!v || 'Name is required',
-      //   v => v.length <= 30 || 'Name must be less than 30 characters',
-      // ],
+      signupValid: false,
+      signupUsername: '',
       password: '',
+      signupConfirmPassword: '',
       email: '',
+      signupEmail: '',
+      signupPassword: '',
       emailRules: [
         v => !!v || 'E-mail is required',
         v => /.+@.+/.test(v) || 'E-mail must be valid',
-      ]
+      ],
+      showSignUp: false
     }),
   }
 </script>
