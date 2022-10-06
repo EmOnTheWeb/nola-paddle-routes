@@ -1,10 +1,11 @@
 <template>
   <div>
+    <!--sign in form -->
     <v-card v-show="!showSignUp">
       <v-card-title>Sign in</v-card-title>
       <v-icon color="accent" class="icon--close" @click="close()">mdi-close</v-icon>
       <v-card-text>
-        <v-form v-model="valid" lazy-validation>
+        <v-form v-model="valid">
           <div id="g-btn-div"></div>
           <div style="text-align:center;margin:13px 0px;"> or </div>
 
@@ -17,18 +18,19 @@
             filled
             outlined
             dense
-            hide-details
+            validate-on-blur
           ></v-text-field>
 
           <v-text-field
             v-model="password"
+            :rules="passwordRules"
             label="Password"
             class="mb-2"
             required
             filled
             outlined
             dense
-            hide-details
+            validate-on-blur
           ></v-text-field>
           <v-btn
            class="mb-1"
@@ -45,22 +47,24 @@
         </v-form>
       </v-card-text>
     </v-card>
+    <!--sign up form-->
     <v-card v-show="showSignUp">
       <v-card-title>Sign up</v-card-title>
       <v-icon color="accent" class="icon--close" @click="close()">mdi-close</v-icon>
       <v-card-text>
-        <v-form v-model="valid" lazy-validation>
+        <v-form v-model="signupValid">
           <div id="g-btn-div2"></div>
           <div style="text-align:center;margin:13px 0px;"> or </div>
           <v-text-field
             v-model="signupUsername"
+            :rules="usernameRules"
             label="Username"
             class="mb-2"
             required
             filled
             outlined
             dense
-            hide-details
+            validate-on-blur
           ></v-text-field>
 
           <v-text-field
@@ -72,29 +76,31 @@
             filled
             outlined
             dense
-            hide-details
+            validate-on-blur
           ></v-text-field>
 
           <v-text-field
             v-model="signupPassword"
+            :rules="passwordRules"
             label="Password"
             class="mb-2"
             required
             filled
             outlined
             dense
-            hide-details
+            validate-on-blur
           ></v-text-field>
 
           <v-text-field
-            v-model="signupConfirmPassword"
-            label="Password"
+            v-model="confirmPassword"
+            :rules="passwordRules.concat(confirmPasswordRules)"
+            label="Confirm Password"
             class="mb-2"
             required
             filled
             outlined
             dense
-            hide-details
+            validate-on-blur
           ></v-text-field>
 
           <v-btn
@@ -145,20 +151,28 @@
       }
     },
     computed: {
-
+      confirmPasswordRules() {
+        return () => (this.signupPassword === this.confirmPassword) || 'Password must match'
+      },
     },
     data: () => ({
       valid: false,
+      password: '',
+      email: '',
       signupValid: false,
       signupUsername: '',
-      password: '',
-      signupConfirmPassword: '',
-      email: '',
       signupEmail: '',
       signupPassword: '',
+      confirmPassword: '',
+      usernameRules: [
+        v => !!v || "Username is required"
+      ],
+      passwordRules: [
+        v => !!v || "Password is required"
+      ],
       emailRules: [
         v => !!v || 'E-mail is required',
-        v => /.+@.+/.test(v) || 'E-mail must be valid',
+        v => /.+@.+/.test(v) || 'E-mail must be valid'
       ],
       showSignUp: false
     }),
@@ -191,6 +205,22 @@
     text-align:center;
     margin-top:20px;
     margin-bottom:4px;
+  }
+
+  ::v-deep .v-text-field__details {
+    display:none;
+  }
+
+  ::v-deep .v-input.error--text {
+    margin-bottom:0px!important;
+    .v-text-field__details{
+      margin-top:1px;
+      display:block;
+    }
+  }
+
+  ::v-deep div.v-input__slot {
+    margin-bottom:0px!important;
   }
 
 
