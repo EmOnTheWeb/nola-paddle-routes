@@ -5,36 +5,40 @@
     <v-card-text>
       <v-form v-model="valid" lazy-validation>
         <div id="g-btn-div"></div>
-        <v-text-field
-          v-model="username"
-          :rules="nameRules"
-          filled
-          outlined
-          label="Username"
-          required
-          dense
-        ></v-text-field>
+        <div style="text-align:center;margin:13px 0px;"> or </div>
 
         <v-text-field
           v-model="email"
           :rules="emailRules"
           label="E-mail"
+          class="mb-2"
           required
           filled
           outlined
           dense
+          hide-details
         ></v-text-field>
 
+        <v-text-field
+          v-model="password"
+          label="Password"
+          class="mb-2"
+          required
+          filled
+          outlined
+          dense
+          hide-details
+        ></v-text-field>
         <v-btn
-        class="mt-3"
+         class="mb-1"
          :disabled="!valid"
          color="accent"
          block
         >
         Sign In
         </v-btn>
-        <section class="actions">
-          <p><a>Forgot your password?</a></p>
+        <p><a style="font-size:0.75rem;">Forgot your password?</a></p>
+        <section class="footer">
           <p>Don't have an account?<a>&nbsp;Sign Up</a></p>
         </section>
       </v-form>
@@ -79,11 +83,12 @@
     },
     data: () => ({
       valid: false,
-      username: '',
-      nameRules: [
-        v => !!v || 'Name is required',
-        v => v.length <= 30 || 'Name must be less than 30 characters',
-      ],
+      // username: '',
+      // nameRules: [
+      //   v => !!v || 'Name is required',
+      //   v => v.length <= 30 || 'Name must be less than 30 characters',
+      // ],
+      password: '',
       email: '',
       emailRules: [
         v => !!v || 'E-mail is required',
@@ -103,21 +108,23 @@
   ::v-deep .v-text-field__details {
     margin-bottom:0px !important;
   }
-  .actions {
-    margin-top:25px;
-    font-weight:500;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    p {
-      margin-bottom:0px;
-      color: var(--v-primary-base);
+
+  .v-card p {
+    margin-bottom:0px;
+    color: var(--v-primary-base);
+    a {
+     text-decoration:none;
+     font-size:14px;
+     color: var(--v-accent-base);
+     font-weight:500;
     }
-     a {
-      text-decoration:none;
-      font-size:14px;
-      color: var(--v-accent-base);
-      font-weight:500;
-     }
   }
+
+  .v-card .footer p {
+    text-align:center;
+    margin-top:20px;
+    margin-bottom:4px;
+  }
+
+
 </style>
