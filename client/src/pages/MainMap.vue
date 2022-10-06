@@ -3,6 +3,9 @@
     <v-dialog v-model="showIndividualView" max-width="600" :hide-overlay="true">
       <individual-view :paddle="paddleClicked" @close="showIndividualView = false"></individual-view>
     </v-dialog>
+    <v-dialog eager v-model="showLoginDialog" max-width="350" :hide-overlay="false">
+      <login @close="showLoginDialog = false"></login>
+    </v-dialog>
     <v-app-bar
       app
       color="white"
@@ -117,8 +120,7 @@
             </section>
 
             <div class="login-btns">
-              <v-btn small depressed class="accent--text">Sign In</v-btn>
-              <v-btn small depressed color="accent">Sign Up</v-btn>
+              <v-btn @click="showLoginDialog = true" small depressed color="accent">Sign In</v-btn>
             </div>
           </v-row>
 
@@ -189,7 +191,7 @@
                 title="Zoom in">
                 <v-icon
                   dark
-                  color="accent">
+                  color="accent darken-2">
                   mdi-plus-thick
                 </v-icon>
               </v-btn>
@@ -198,7 +200,7 @@
                 title="Zoom out">
                 <v-icon
                   dark
-                  color="accent">
+                  color="accent darken-2">
                   mdi-minus-thick
                 </v-icon>
               </v-btn>
@@ -206,7 +208,7 @@
                 title="Print">
                 <v-icon
                   dark
-                  color="accent">
+                  color="accent darken-2">
                   mdi-printer
                 </v-icon>
               </v-btn>
@@ -216,7 +218,7 @@
                 title="Zoom out to map's original position">
                 <v-icon
                   dark
-                  color="accent">
+                  color="accent darken-2">
                   mdi-magnify-minus-cursor
                 </v-icon>
               </v-btn>
@@ -232,6 +234,7 @@
   import {MainMap} from '../utils/mainMap';
   import {LouisianaTowns} from '../assets/louisianaTowns.js';
   import IndividualView from '../pages/IndividualView.vue';
+  import Login from '../pages/Login.vue';
   import NODE_API from '../utils/api';
   import Vue from 'vue';
   // import length from '@turf/length';
@@ -240,6 +243,7 @@
   export default {
     components: {
       IndividualView,
+      Login
     },
     created() {
 
@@ -497,7 +501,8 @@
       showIndividualView: false,
       paddleRoutesShowing: {},
       myLocation: {},
-      paddleClicked: {}
+      paddleClicked: {},
+      showLoginDialog: false
     }),
   }
 
