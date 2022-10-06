@@ -131,7 +131,7 @@
     margin-top:5px; margin-bottom:5px;
     .actions {
       padding: 5px;
-      border: 2px solid var(--v-accent-lighten1);
+      border: 1px solid var(--v-accent-lighten1);
       border-radius: 10px;
       font-weight:bold;
     }
@@ -158,7 +158,7 @@
     padding:0px 15px;
     .v-tab {
       background-color: white;
-      border: 2px solid black;
+      border: 1px solid black;
       border-bottom: 0px;
       border-top-left-radius: 10px;
       border-top-right-radius: 10px;
