@@ -6,4 +6,8 @@ routes.route('/importRawData').get(handlers.importRawData);
 
 routes.route('/getMapPins').get(handlers.getRouteNamesAndStartCoordinates);
 
+routes.route('/user').post(handlers.addUser);
+
+routes.route('/user').get(handlers.getUser);
+
 module.exports = routes;

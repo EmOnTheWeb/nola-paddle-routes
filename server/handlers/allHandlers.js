@@ -2,9 +2,68 @@ const dbo = require('../db/conn');
 const fs = require('fs');
 const tj = require('@mapbox/togeojson');
 DOMParser = require('xmldom').DOMParser;
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
+
+async function getUser(req,res) {
+  const sessionData = req.session;
+  let isLoggedIn;
+  if (sessionData.loggedIn) {
+    isLoggedIn = true;
+  } else {
+    isLoggedIn = false;
+  }
+
+  let responseObj = {};
+  responseObj.isLoggedIn = isLoggedIn;
+  if (sessionData.username) {
+    responseObj.username = sessionData.username;
+  }
+  res.send(responseObj);
+}
+
+async function addUser(req,res) {
+
+  let {username, email, password} = req.body;
+  const db = dbo.getDb();
+  const usersCollection = db.collection('users');
+  let errors = [];
+  let usernameExists = await usersCollection.findOne({username:username});
+
+  if (usernameExists) {
+    errors.push('This username is taken');
+  }
+
+  let emailExists = await usersCollection.findOne({email:email});
+  if (emailExists) {
+    errors.push('This email already exists');
+  }
+
+  if (errors.length) {
+    res.send({
+      success: false,
+      errors: errors
+    });
+  } else {
+    bcrypt.hash(password, saltRounds, async function(err, hash) {
+      await usersCollection.insertOne(
+        {
+          'username':username,
+          'email':email,
+          'password':password
+        }
+      );
+      req.session.loggedIn = true;
+      req.session.username = username;
+      res.success = true;
+      res.send({
+        success: true
+      });
+    });
+  }
+}
 
 async function getRouteNamesAndStartCoordinates(req,res) {
-
   const db = dbo.getDb();
   const paddlesCollection = db.collection('paddles');
   let array = await paddlesCollection.find({}).sort({'name':1}).toArray();
@@ -124,3 +183,5 @@ function importRawData(req,res) {
 
 module.exports.importRawData = importRawData;
 module.exports.getRouteNamesAndStartCoordinates = getRouteNamesAndStartCoordinates;
+module.exports.addUser = addUser;
+module.exports.getUser = getUser;

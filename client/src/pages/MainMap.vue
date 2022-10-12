@@ -119,8 +119,18 @@
               ></v-select>
             </section>
 
-            <div class="login-btns">
-              <v-btn @click="showLoginDialog = true" small depressed color="accent">Sign In</v-btn>
+            <div class="login-btns" v-show="userDataLoaded">
+              <v-btn v-if="!userData.isLoggedIn" @click="showLoginDialog = true" small depressed color="accent">Sign In</v-btn>
+              <span>
+                <v-icon
+                  dark
+                  color="accent"
+                  v-show="userData.isLoggedIn"
+                  >
+                  mdi-account
+                </v-icon>
+                Hello {{userData.username}}
+              </span>
             </div>
           </v-row>
 
@@ -246,6 +256,11 @@
       Login
     },
     created() {
+
+      NODE_API.get('/user').then(response => {
+        this.userData = response.data;
+        this.userDataLoaded = true;
+      });
 
       NODE_API.get('/getMapPins').then(response => {
         this.paddles = response.data;
@@ -502,7 +517,9 @@
       paddleRoutesShowing: {},
       myLocation: {},
       paddleClicked: {},
-      showLoginDialog: false
+      showLoginDialog: false,
+      userData: {},
+      userDataLoaded: false
     }),
   }
 

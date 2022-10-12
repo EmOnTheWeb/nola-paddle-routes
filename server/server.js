@@ -4,11 +4,41 @@ const express = require('express');
 const cors = require('cors');
 // get MongoDB driver connection
 const dbo = require('./db/conn');
+const sessions = require('express-session');
+const MongoDBStore = require('connect-mongodb-session')(sessions);
+const uri = `mongodb+srv://${process.env.DB_NAME}:${process.env.DB_PASSWORD}@cluster0.o3atuqr.mongodb.net/?retryWrites=true&w=majority`;
 
 const PORT = process.env.PORT || 5000;
 const app = express();
 
-app.use(cors());
+const store = new MongoDBStore(
+  {
+    uri: uri,
+    databaseName: 'PaddleRoutes',
+    collection: 'sessions'
+  }
+);
+
+store.on('error', function(error) {
+  console.log('errorhandler');
+  console.log(error);
+});
+
+app.use(sessions(
+  {
+    secret: process.env.COOKIE_SECRET,
+    store: store,
+    saveUninitialized: false,
+    resave: false,
+    cookie: { secure: false }
+  }
+));
+
+const corsOpts = {
+  credentials: true,
+  origin: 'http://localhost:8080'
+}
+app.use(cors(corsOpts));
 app.use(express.json());
 app.use(require('./routes/routes.js'));
 

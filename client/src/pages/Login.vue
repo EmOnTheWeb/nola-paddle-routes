@@ -49,79 +49,96 @@
     </v-card>
     <!--sign up form-->
     <v-card v-show="showSignUp">
-      <v-card-title>Sign up</v-card-title>
-      <v-icon color="accent" class="icon--close" @click="close()">mdi-close</v-icon>
-      <v-card-text>
-        <v-form v-model="signupValid">
-          <div id="g-btn-div2"></div>
-          <div style="text-align:center;margin:13px 0px;"> or </div>
-          <v-text-field
-            v-model="signupUsername"
-            :rules="usernameRules"
-            label="Username"
-            class="mb-2"
-            required
-            filled
-            outlined
-            dense
-            validate-on-blur
-          ></v-text-field>
+      <div v-if="!showSignUpSuccessMessage">
+        <v-card-title>Sign up</v-card-title>
+        <v-icon color="accent" class="icon--close" @click="close()">mdi-close</v-icon>
+        <v-card-text>
+          <v-form ref="signupForm">
+            <div id="g-btn-div2"></div>
+            <div style="text-align:center;margin:13px 0px;"> or </div>
+            <v-text-field
+              v-model="signupUsername"
+              :rules="usernameRules"
+              label="Username"
+              class="mb-2"
+              required
+              filled
+              outlined
+              dense
+              validate-on-blur
+            ></v-text-field>
 
-          <v-text-field
-            v-model="signupEmail"
-            :rules="emailRules"
-            label="E-mail"
-            class="mb-2"
-            required
-            filled
-            outlined
-            dense
-            validate-on-blur
-          ></v-text-field>
+            <v-text-field
+              v-model="signupEmail"
+              :rules="emailRules"
+              label="E-mail"
+              class="mb-2"
+              required
+              filled
+              outlined
+              dense
+              validate-on-blur
+            ></v-text-field>
 
-          <v-text-field
-            v-model="signupPassword"
-            :rules="passwordRules"
-            label="Password"
-            class="mb-2"
-            required
-            filled
-            outlined
-            dense
-            validate-on-blur
-          ></v-text-field>
+            <v-text-field
+              v-model="signupPassword"
+              :rules="passwordRules"
+              label="Password"
+              class="mb-2"
+              required
+              filled
+              outlined
+              dense
+              validate-on-blur
+            ></v-text-field>
 
-          <v-text-field
-            v-model="confirmPassword"
-            :rules="passwordRules.concat(confirmPasswordRules)"
-            label="Confirm Password"
-            class="mb-2"
-            required
-            filled
-            outlined
-            dense
-            validate-on-blur
-          ></v-text-field>
-
-          <v-btn
-           class="mb-1"
-           :disabled="!signupValid"
-           color="accent"
-           block
-          >
-          Sign Up
-          </v-btn>
-          <section class="footer">
-            <p>Already have an account?<a @click="showSignUp = false">&nbsp;Sign In</a></p>
-          </section>
-        </v-form>
-      </v-card-text>
+            <v-text-field
+              v-model="confirmPassword"
+              :rules="passwordRules.concat(confirmPasswordRules)"
+              label="Confirm Password"
+              class="mb-2"
+              required
+              filled
+              outlined
+              dense
+              validate-on-blur
+            ></v-text-field>
+            <v-list
+              v-if="signUpErrors.length"
+              color="transparent"
+              text-color="error"
+            >
+              <v-list-item v-for="(error) in signUpErrors">
+                {{error}}
+              </v-list-item>
+            </v-list>
+            <v-btn
+             class="mb-1"
+             @click="validateAndSubmitSignup()"
+             color="accent"
+             block
+            >
+            Sign Up
+            </v-btn>
+            <section class="footer">
+              <p>Already have an account?<a @click="showSignUp = false">&nbsp;Sign In</a></p>
+            </section>
+          </v-form>
+        </v-card-text>
+      </div>
+      <div v-else>
+        <v-card-text class="sign-up-success-message">
+          Thanks for signing up!
+          <a @click="close()">&nbsp;Back to Paddles</a>
+        </v-card-text>
+      </div>
     </v-card>
   </div>
 </template>
 
 <script>
   import Vue from 'vue';
+  import NODE_API from '../utils/api';
 
   export default {
     name: 'Login',
@@ -146,6 +163,28 @@
       handleCredentialResponse(response) {
         console.log("Encoded JWT ID token: " + response.credential);
       },
+      validateAndSubmitSignup() {
+        let isValid = this.$refs.signupForm.validate();
+        if (isValid) {
+
+          let reqObj = {
+            "username":this.signupUsername,
+            "email":this.signupEmail,
+            "password":this.signupPassword
+          }
+
+          NODE_API.post('/user', reqObj).then(response => {
+            if(response.data.success === false) {
+              this.signUpErrors = response.data.errors;
+            } else if (response.data.success === true) {
+              this.showSignUpSuccessMessage = true;
+            }
+          })
+          .catch(error => {
+            console.log(error);
+          });
+        }
+      },
       close() {
         this.$emit('close',true);
       }
@@ -159,7 +198,6 @@
       valid: false,
       password: '',
       email: '',
-      signupValid: false,
       signupUsername: '',
       signupEmail: '',
       signupPassword: '',
@@ -174,12 +212,22 @@
         v => !!v || 'E-mail is required',
         v => /.+@.+/.test(v) || 'E-mail must be valid'
       ],
-      showSignUp: false
+      showSignUp: false,
+      signUpErrors: [],
+      showSignUpSuccessMessage: false
     }),
   }
 </script>
 
 <style lang="scss" scoped>
+  .v-list {
+    padding:0px;
+    margin-top:-7px;
+  }
+  .v-list-item {
+    min-height:0px;
+    color: var(--v-error-base)!important;
+  }
   .v-card .icon--close {
     position: absolute;
     right: 10px;
@@ -199,6 +247,13 @@
      color: var(--v-accent-base);
      font-weight:500;
     }
+  }
+
+  .sign-up-success-message a {
+    text-decoration:none;
+    font-size:14px;
+    color: var(--v-accent-base);
+    font-weight:500;
   }
 
   .v-card .footer p {
