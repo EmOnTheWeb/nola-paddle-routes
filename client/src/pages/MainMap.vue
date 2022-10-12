@@ -121,11 +121,10 @@
 
             <div class="login-btns" v-show="userDataLoaded">
               <v-btn v-if="!userData.isLoggedIn" @click="showLoginDialog = true" small depressed color="accent">Sign In</v-btn>
-              <span>
+              <span v-show="userData.isLoggedIn">
                 <v-icon
                   dark
                   color="accent"
-                  v-show="userData.isLoggedIn"
                   >
                   mdi-account
                 </v-icon>

@@ -6,8 +6,8 @@
       <v-icon color="accent" class="icon--close" @click="close()">mdi-close</v-icon>
       <v-card-text>
         <v-form v-model="valid">
-          <div id="g-btn-div"></div>
-          <div style="text-align:center;margin:13px 0px;"> or </div>
+          <!-- <div id="g-btn-div"></div>
+          <div style="text-align:center;margin:13px 0px;"> or </div> -->
 
           <v-text-field
             v-model="email"
@@ -54,8 +54,8 @@
         <v-icon color="accent" class="icon--close" @click="close()">mdi-close</v-icon>
         <v-card-text>
           <v-form ref="signupForm">
-            <div id="g-btn-div2"></div>
-            <div style="text-align:center;margin:13px 0px;"> or </div>
+            <!-- <div id="g-btn-div2"></div>
+            <div style="text-align:center;margin:13px 0px;"> or </div> -->
             <v-text-field
               v-model="signupUsername"
               :rules="usernameRules"
@@ -146,18 +146,18 @@
       show: Boolean
     },
     mounted() {
-      google.accounts.id.initialize({
-        client_id: "391860046963-d7m4ajreb15t9bj2dakrfh5gm4as798s.apps.googleusercontent.com",
-        callback: this.handleCredentialResponse
-      });
-      google.accounts.id.renderButton(
-        document.getElementById("g-btn-div"),
-        { theme: "outline", width:"318"}  // customization attributes
-      );
-      google.accounts.id.renderButton(
-        document.getElementById("g-btn-div2"),
-        { theme: "outline", text: "signup_with"}  // customization attributes
-      );
+      // google.accounts.id.initialize({
+      //   client_id: "391860046963-d7m4ajreb15t9bj2dakrfh5gm4as798s.apps.googleusercontent.com",
+      //   callback: this.handleCredentialResponse
+      // });
+      // google.accounts.id.renderButton(
+      //   document.getElementById("g-btn-div"),
+      //   { theme: "outline", width:"318"}  // customization attributes
+      // );
+      // google.accounts.id.renderButton(
+      //   document.getElementById("g-btn-div2"),
+      //   { theme: "outline", text: "signup_with"}  // customization attributes
+      // );
     },
     methods: {
       handleCredentialResponse(response) {
