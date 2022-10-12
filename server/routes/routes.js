@@ -10,4 +10,6 @@ routes.route('/user').post(handlers.addUser);
 
 routes.route('/user').get(handlers.getUser);
 
+routes.route('/signin').post(handlers.signInUser);
+
 module.exports = routes;

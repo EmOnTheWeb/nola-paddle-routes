@@ -4,7 +4,10 @@
       <individual-view :paddle="paddleClicked" @close="showIndividualView = false"></individual-view>
     </v-dialog>
     <v-dialog eager v-model="showLoginDialog" max-width="350" :hide-overlay="false">
-      <login @close="showLoginDialog = false"></login>
+      <login
+        @close="(data) => handleLoginDialogClose(data)"
+        @setUserData="(data) => setUserData(data)">
+      </login>
     </v-dialog>
     <v-app-bar
       app
@@ -257,7 +260,7 @@
     created() {
 
       NODE_API.get('/user').then(response => {
-        this.userData = response.data;
+        this.setUserData(response.data);
         this.userDataLoaded = true;
       });
 
@@ -289,6 +292,18 @@
       }
     },
     methods: {
+      setUserData(userData) {
+        this.$set(this.userData,'isLoggedIn', userData.loggedIn);
+        this.$set(this.userData,'username', userData.username);
+        this.$set(this.userData,'uid',userData.uid);
+      },
+      handleLoginDialogClose(data) {
+        this.showLoginDialog = false;
+        if (data) {
+          this.setUserData(data);
+          this.userDataLoaded = true;
+        }
+      },
       ifRouteShowingShowIndividualView(paddle,evt) {
         if (this.paddleRoutesShowing[paddle.id]) {
           evt.stopPropagation();

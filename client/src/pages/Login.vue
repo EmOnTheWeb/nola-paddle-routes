@@ -5,7 +5,7 @@
       <v-card-title>Sign in</v-card-title>
       <v-icon color="accent" class="icon--close" @click="close()">mdi-close</v-icon>
       <v-card-text>
-        <v-form v-model="valid">
+        <v-form v-model="valid" ref="signinForm">
           <!-- <div id="g-btn-div"></div>
           <div style="text-align:center;margin:13px 0px;"> or </div> -->
 
@@ -32,11 +32,26 @@
             dense
             validate-on-blur
           ></v-text-field>
+
+          <v-list
+            v-if="signInErrors.length"
+            color="transparent"
+            text-color="error"
+          >
+            <v-list-item
+              v-for="(error,index) in signInErrors"
+              :key="index"
+            >
+              {{error}}
+            </v-list-item>
+          </v-list>
+
           <v-btn
            class="mb-1"
            :disabled="!valid"
            color="accent"
            block
+           @click="validateAndSubmitSignin()"
           >
           Sign In
           </v-btn>
@@ -108,7 +123,10 @@
               color="transparent"
               text-color="error"
             >
-              <v-list-item v-for="(error) in signUpErrors">
+              <v-list-item
+                v-for="(error,index) in signUpErrors"
+                :key="index"
+              >
                 {{error}}
               </v-list-item>
             </v-list>
@@ -163,6 +181,27 @@
       handleCredentialResponse(response) {
         console.log("Encoded JWT ID token: " + response.credential);
       },
+      validateAndSubmitSignin() {
+        let isValid = this.$refs.signinForm.validate();
+        if (isValid) {
+          let reqObj = {
+            "email":this.email,
+            "password":this.password
+          }
+
+          NODE_API.post('/signin', reqObj).then(response => {
+            if(response.data.success === false) {
+              this.signInErrors = response.data.errors;
+            } else {
+              this.$emit('close',response.data);
+            }
+          })
+          .catch(error => {
+            console.log(error);
+          });
+        }
+
+      },
       validateAndSubmitSignup() {
         let isValid = this.$refs.signupForm.validate();
         if (isValid) {
@@ -178,6 +217,7 @@
               this.signUpErrors = response.data.errors;
             } else if (response.data.success === true) {
               this.showSignUpSuccessMessage = true;
+              this.$emit('setUserData',response.data);
             }
           })
           .catch(error => {
@@ -186,7 +226,7 @@
         }
       },
       close() {
-        this.$emit('close',true);
+        this.$emit('close');
       }
     },
     computed: {
@@ -214,7 +254,8 @@
       ],
       showSignUp: false,
       signUpErrors: [],
-      showSignUpSuccessMessage: false
+      showSignUpSuccessMessage: false,
+      signInErrors: []
     }),
   }
 </script>
@@ -227,6 +268,9 @@
   .v-list-item {
     min-height:0px;
     color: var(--v-error-base)!important;
+    padding:0px;
+    font-size:12px;
+    line-height:15px;
   }
   .v-card .icon--close {
     position: absolute;
@@ -271,6 +315,7 @@
     .v-text-field__details{
       margin-top:1px;
       display:block;
+      padding:0px;
     }
   }
 

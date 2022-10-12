@@ -5,8 +5,52 @@ DOMParser = require('xmldom').DOMParser;
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
+async function signInUser(req,res) {
+
+  let {email, password} = req.body;
+  email = email.toLowerCase();
+  password = password.toLowerCase();
+
+  const db = dbo.getDb();
+  const usersCollection = db.collection('users');
+  let errors = [];
+  let user = await usersCollection.findOne({email:email});
+
+  if (!user) {
+    errors.push('There is no account with this email address');
+    res.send({
+      success: false,
+      errors: errors
+    });
+  } else {
+    let hash = user.password;
+    //validate password
+    bcrypt.compare(password, hash, function(err, result) {
+      if(result) {
+        req.session.loggedIn = true;
+        req.session.username = user.username;
+        let userId = user._id.toString();
+        req.session.uid = userId;
+        res.send({
+          success: true,
+          loggedIn: true,
+          uid: userId,
+          username: user.username
+        });
+      } else {
+        errors.push('Password did not match');
+        res.send({
+          success: false,
+          errors: errors
+        });
+      }
+    });
+  }
+}
+
 async function getUser(req,res) {
   const sessionData = req.session;
+
   let isLoggedIn;
   if (sessionData.loggedIn) {
     isLoggedIn = true;
@@ -15,16 +59,19 @@ async function getUser(req,res) {
   }
 
   let responseObj = {};
-  responseObj.isLoggedIn = isLoggedIn;
+  responseObj.loggedIn = isLoggedIn;
   if (sessionData.username) {
     responseObj.username = sessionData.username;
   }
+  responseObj.uid = sessionData.uid;
   res.send(responseObj);
 }
 
 async function addUser(req,res) {
 
   let {username, email, password} = req.body;
+  email = email.toLowerCase();
+  password = password.toLowerCase();
   const db = dbo.getDb();
   const usersCollection = db.collection('users');
   let errors = [];
@@ -46,18 +93,22 @@ async function addUser(req,res) {
     });
   } else {
     bcrypt.hash(password, saltRounds, async function(err, hash) {
-      await usersCollection.insertOne(
+      let newUser = await usersCollection.insertOne(
         {
           'username':username,
           'email':email,
-          'password':password
+          'password':hash
         }
       );
       req.session.loggedIn = true;
       req.session.username = username;
-      res.success = true;
+      req.session.uid = newUser.insertedId.toString();
+
       res.send({
-        success: true
+        success: true,
+        loggedIn: true,
+        uid: req.session.uid,
+        username: username
       });
     });
   }
@@ -185,3 +236,4 @@ module.exports.importRawData = importRawData;
 module.exports.getRouteNamesAndStartCoordinates = getRouteNamesAndStartCoordinates;
 module.exports.addUser = addUser;
 module.exports.getUser = getUser;
+module.exports.signInUser = signInUser;
