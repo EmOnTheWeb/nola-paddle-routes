@@ -5,6 +5,12 @@ DOMParser = require('xmldom').DOMParser;
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
+function logout(req, res) {
+  req.session.destroy(function(err) {
+    res.send({success:true}); 
+  });
+}
+
 async function signInUser(req,res) {
 
   let {email, password} = req.body;
@@ -237,3 +243,4 @@ module.exports.getRouteNamesAndStartCoordinates = getRouteNamesAndStartCoordinat
 module.exports.addUser = addUser;
 module.exports.getUser = getUser;
 module.exports.signInUser = signInUser;
+module.exports.logout = logout;

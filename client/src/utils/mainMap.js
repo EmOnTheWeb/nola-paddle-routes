@@ -94,7 +94,6 @@ export class MainMap {
 
   getPaddleColor(thePaddle,strVal = false) {
     let color;
-    debugger;
     let distance = Number(thePaddle.distance);
     if (distance < 6 ) {
       if (strVal) {
@@ -133,7 +132,7 @@ export class MainMap {
         let thePaddle = paddleData.find((e) => e.id === id);
 
         let color = this.getPaddleColor(thePaddle);
-  
+
         return {
           'type': 'Feature',
           'properties': { 'name': thePaddle.name, color: color },

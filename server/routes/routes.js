@@ -12,4 +12,6 @@ routes.route('/user').get(handlers.getUser);
 
 routes.route('/signin').post(handlers.signInUser);
 
+routes.route('/logout').post(handlers.logout);
+
 module.exports = routes;

@@ -158,7 +158,7 @@
                 <v-list-item class="mb-1">
                   <v-checkbox dense hide-details
                     v-model="aPaddleRouteIsShowing"
-                    color="accent darken-1"
+                    color="accent"
                     :disabled="!aPaddleRouteIsShowing"
                     @click="hideAllRoutes()"
                   ></v-checkbox>
@@ -180,7 +180,7 @@
                     v-model="paddleRoutesShowing[paddle.id]"
                     dense
                     hide-details
-                    color="accent darken-1"
+                    color="accent"
                     style="pointer-events:none;"
                   >
                   </v-checkbox>
@@ -301,7 +301,13 @@
     },
     methods: {
       logout() {
-
+        NODE_API.post('/logout').then(response => {
+          this.userData = {};
+          this.$set(this.userData,'isLoggedIn',false);
+        })
+        .catch(error => {
+          console.log(error);
+        });
       },
       setUserData(userData) {
         this.$set(this.userData,'isLoggedIn', userData.loggedIn);
@@ -709,26 +715,19 @@
     margin-left:-10px;
     margin-top:4px;
   }
-
   ::v-deep .marker.marker--green{
     background-image: url('../assets/marker-icon-green.png');
   }
-
   ::v-deep .marker.marker--red{
     background-image: url('../assets/marker-icon-red.png');
   }
-
   ::v-deep .marker.marker--yellow{
     background-image: url('../assets/marker-icon-orange.png');
   }
-
   .login-btns {
     cursor:pointer;
     border-left:1px solid var(--v-primary-lighten5);
     padding:0px 10px;
-    > :first-child {
-      margin-right:10px;
-    }
   }
   ::v-deep .mdi-menu-down.v-icon.theme--light   {
     color:var(--v-accent-base);
