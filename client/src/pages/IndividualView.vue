@@ -46,7 +46,8 @@
         @showLoginDialog="emitShowSignIn()"
         :comments="comments"
         :idPaddle="paddle.id"
-        :userIsLoggedIn="userIsLoggedIn"></comments>
+        :userIsLoggedIn="userIsLoggedIn"
+        :userId="userId"></comments>
       </v-tab-item>
     </v-tabs-items>
 
@@ -67,10 +68,11 @@
     props: {
       paddle: Object,
       show: Boolean,
-      userIsLoggedIn: Boolean
+      userIsLoggedIn: Boolean,
+      userId: String
     },
     mounted() {
-
+      console.log('i mounted');
     },
     methods: {
       emitShowSignIn() {
@@ -156,7 +158,7 @@
     color: var(--v-primary--base);
   }
    .v-dialog>.v-card> .v-card__title {
-    padding:7px 18px;
+    padding:20px 18px;
     color: var(--v-primary--base);
   }
   ::v-deep .v-tabs-bar {
@@ -167,7 +169,7 @@
   }
   .v-tabs {
     margin-top: 20px;
-    padding:0px 15px;
+    padding:0px 10px;
     .v-tab {
       background-color: white;
       border: 1px solid black;
@@ -175,6 +177,8 @@
       border-top-left-radius: 10px;
       border-top-right-radius: 10px;
       border:none;
+      padding:0px;
+      text-transform:none;
     }
   }
   ::v-deep .v-tabs-slider-wrapper {

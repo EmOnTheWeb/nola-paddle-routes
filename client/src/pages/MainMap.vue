@@ -3,6 +3,7 @@
     <v-dialog v-model="showIndividualView" max-width="600" :hide-overlay="true">
       <individual-view
         :userIsLoggedIn="userData.isLoggedIn"
+        :userId="userData.uid"
         :paddle="paddleClicked"
         @close="showIndividualView = false"
         @showLoginDialog="showLoginDialog = true"

@@ -5,6 +5,23 @@ DOMParser = require('xmldom').DOMParser;
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
+async function deleteComment(req,res) {
+
+  let userId = req.session.uid;
+  let comment = req.body.comment;
+  let idPaddle = req.body.idPaddle;
+
+  const db = dbo.getDb();
+  const commentsCollection = db.collection('comments');
+
+  await commentsCollection.updateOne(
+    {idPaddle: idPaddle},
+    {$pull : {"comments" : {comment:comment,uid:userId}}}
+  );
+
+  res.send({success:true}); 
+}
+
 async function addComment(req, res) {
 
   let idPaddle = req.body.idPaddle;
@@ -45,6 +62,20 @@ async function addComment(req, res) {
   }
 
   res.send(responseObj);
+}
+
+async function getComments(req, res) {
+
+  const db = dbo.getDb();
+  const commentsCollection = db.collection('comments');
+
+  let idPaddle = req.query.idPaddle;
+  let comments = await commentsCollection.findOne({idPaddle:idPaddle});
+
+  res.send({
+    success:true,
+    comments:comments.comments.reverse()
+  });
 }
 
 function logout(req, res) {
@@ -287,3 +318,5 @@ module.exports.getUser = getUser;
 module.exports.signInUser = signInUser;
 module.exports.logout = logout;
 module.exports.addComment = addComment;
+module.exports.getComments = getComments;
+module.exports.deleteComment = deleteComment;

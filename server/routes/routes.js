@@ -16,4 +16,8 @@ routes.route('/logout').post(handlers.logout);
 
 routes.route('/comment').post(handlers.addComment);
 
+routes.route('/comment').put(handlers.deleteComment);
+
+routes.route('/comment').get(handlers.getComments);
+
 module.exports = routes;

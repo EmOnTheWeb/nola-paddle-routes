@@ -18,11 +18,12 @@
       :key="index"
     >
       <v-list-item-content>
-        <v-list-item-title>
-          Emilie <span class="date-posted">12/2/1980</span>
-        </v-list-item-title>
+        <v-list-item-content>
+          {{comment.comment}}
+        </v-list-item-content>
         <v-list-item-subtitle>
-          {{comment.text}}
+          Posted by <span class="user-posted">{{comment.username}}</span> on <span class="date-posted">{{getFormattedDate(comment.dttimestamp)}}</span>
+          <span class="delete-comment" v-if="userId == comment.uid" @click="deleteComment(comment.comment, index)">Delete</span>
         </v-list-item-subtitle>
       </v-list-item-content>
     </v-list-item>
@@ -34,22 +35,49 @@
 
 export default {
   props: {
-    comments: [],
     userIsLoggedIn: Boolean,
-    idPaddle: String
+    idPaddle: String,
+    userId: String
   },
   mounted() {
-
+    NODE_API.get('/comment',{
+      params: {
+        idPaddle:this.idPaddle
+      }
+    }).then(response => {
+      if(response.data.success) {
+        this.comments = response.data.comments;
+      }
+    })
+    .catch(error => {
+      console.log(error);
+    });
   },
   methods: {
+    deleteComment(commentText, index) {
+      NODE_API.put('/comment', {comment:commentText, idPaddle:this.idPaddle}).then(response => {
+        if (response.data.success) {
+          this.comments.splice(index,1);
+        }
+      });
+    },
+    getFormattedDate(isoDate) {
+      let dateObj = new Date(isoDate);
+      let day = dateObj.getDate();
+      let year = dateObj.getFullYear();
+      let month = dateObj.getMonth();
+
+      return `${month}/${day}/${year}`;
+    },
     checkLoginAndSubmitComment() {
       if (!this.userIsLoggedIn) {
         this.$emit('showLoginDialog');
       } else {
         let reqObj = { comment: this.comment, idPaddle: this.idPaddle };
         NODE_API.post('/comment', reqObj).then(response => {
-          if(response.data.success === false) {
-
+          if(response.data.success) {
+            this.comments.unshift(response.data.comment);
+            this.comment = '';
           }
         })
         .catch(error => {
@@ -61,7 +89,8 @@ export default {
   data() {
     return {
       count: 0,
-      comment: ''
+      comment: '',
+      comments: []
     }
   },
   computed: {
@@ -73,19 +102,31 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  .delete-comment {
+    font-weight:500;
+    color: var(--v-primary-base);
+    cursor:pointer;
+    float:right;
+  }
   .v-list-item {
     min-height:48px;
+    padding: 7px 0px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    border-bottom:1px solid var(--v-primary-base);
     .v-list-item__content {
       padding-top:0px; padding-bottom:0px;
+        font-size:14px;
+      .v-list-item__subtitle {
+        font-size:12px;
+        .date-posted, .user-posted {
+          font-weight:500;
+        }
+      }
     }
   }
-  .v-list-item__title {
-    font-size: 0.85rem;
-    font-weight:bold;
-    .date-posted {
-      font-size:0.75rem;
-      color: rgba(0,0,0,.6);
-    }
+  .v-tab {
+    padding:0px;
   }
   .v-tabs-bar {
     height:30px;
