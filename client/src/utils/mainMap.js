@@ -39,6 +39,10 @@ export class MainMap {
       const el = document.createElement('div');
       el.className = 'marker';
 
+      let markerColor = this.getPaddleColor(paddle, true);
+      markerColor = 'marker--' + markerColor
+      el.classList.add(markerColor);
+
       const marker = new mapboxgl.Marker(el, {anchor:'bottom-left'})
         .setLngLat([paddle.pin[0], paddle.pin[1]])
         .addTo(this.map);
@@ -88,6 +92,32 @@ export class MainMap {
     return this.markers;
   }
 
+  getPaddleColor(thePaddle,strVal = false) {
+    let color;
+    debugger;
+    let distance = Number(thePaddle.distance);
+    if (distance < 6 ) {
+      if (strVal) {
+        color = 'green';
+      } else {
+        color = COLOR_SHORT;
+      }
+    } else if ( distance <= 11 ) {
+      if (strVal) {
+        color = 'yellow';
+      } else {
+        color = COLOR_MEDIUM;
+      }
+    } else {
+      if (strVal) {
+        color = 'red';
+      } else {
+        color = COLOR_LONG;
+      }
+    }
+    return color;
+  }
+
   drawPaddleRoutes(idPaddlesToShow, paddleData, callback) {
 
     if (idPaddlesToShow.length === 0) {
@@ -102,16 +132,8 @@ export class MainMap {
       let features = idPaddlesToShow.map((id) => {
         let thePaddle = paddleData.find((e) => e.id === id);
 
-        let color;
-        let distance = Number(thePaddle.distance);
-        if (distance < 6 ) {
-          color = COLOR_SHORT;
-        } else if ( distance <= 11 ) {
-          color = COLOR_MEDIUM;
-        } else {
-          color = COLOR_LONG;
-        }
-
+        let color = this.getPaddleColor(thePaddle);
+  
         return {
           'type': 'Feature',
           'properties': { 'name': thePaddle.name, color: color },
@@ -131,15 +153,7 @@ export class MainMap {
       //otherwise add the source with the route
       let thePaddle = paddleData.find((e) => e.id === idPaddlesToShow[0]);
 
-      let color;
-      let distance = Number(thePaddle.distance);
-      if (distance < 6 ) {
-        color = COLOR_SHORT;
-      } else if ( distance < 10 ) {
-        color = COLOR_MEDIUM;
-      } else {
-        color = COLOR_LONG;
-      }
+      let color = this.getPaddleColor(thePaddle);
 
       let feature = {
         'type': 'Feature',

@@ -124,18 +124,26 @@
 
             <div class="login-btns" v-show="userDataLoaded">
               <v-btn v-if="!userData.isLoggedIn" @click="showLoginDialog = true" small depressed color="accent">Sign In</v-btn>
-              <span v-show="userData.isLoggedIn">
-                <v-icon
-                  dark
-                  color="accent"
-                  >
-                  mdi-account
-                </v-icon>
-                Hello {{userData.username}}
-              </span>
+              <v-menu bottom offset-y open-on-hover>
+                <template v-slot:activator="{ on, attrs }">
+                  <span v-show="userData.isLoggedIn" v-bind="attrs" v-on="on">
+                    <v-icon
+                      dark
+                      color="accent"
+                      >
+                      mdi-account
+                    </v-icon>
+                    <span class="account-text">{{userData.username}}</span>
+                  </span>
+                </template>
+                <v-list>
+                  <v-list-item @click="logout()">
+                    <v-list-item-title>Logout</v-list-item-title>
+                  </v-list-item>
+                </v-list>
+              </v-menu>
             </div>
           </v-row>
-
         </v-col>
 
       </v-container>
@@ -150,7 +158,7 @@
                 <v-list-item class="mb-1">
                   <v-checkbox dense hide-details
                     v-model="aPaddleRouteIsShowing"
-                    color="accent lighten-1"
+                    color="accent darken-1"
                     :disabled="!aPaddleRouteIsShowing"
                     @click="hideAllRoutes()"
                   ></v-checkbox>
@@ -172,7 +180,7 @@
                     v-model="paddleRoutesShowing[paddle.id]"
                     dense
                     hide-details
-                    color="accent lighten-1"
+                    color="accent darken-1"
                     style="pointer-events:none;"
                   >
                   </v-checkbox>
@@ -292,6 +300,9 @@
       }
     },
     methods: {
+      logout() {
+
+      },
       setUserData(userData) {
         this.$set(this.userData,'isLoggedIn', userData.loggedIn);
         this.$set(this.userData,'username', userData.username);
@@ -336,7 +347,7 @@
         this.mainMap.drawPaddleRoutes(idPaddleRoutesToShow,this.paddles,handlePaddleRouteClicked);
 
         if(paddleToggledOn) {
-          this.mainMap.flyToFitRouteBounds(paddle);
+          // this.mainMap.flyToFitRouteBounds(paddle);
           // this.mainMap.showMoreInfoButton(paddle.id);
         }
       },
@@ -541,6 +552,11 @@
 </script>
 
 <style lang="scss" scoped>
+  .account-text {
+    font-size: 0.85rem; font-weight:500;
+    margin-left:5px;
+    margin-right:1px;
+  }
   .v-list-item {
     min-height:0px;
   }
@@ -686,7 +702,6 @@
     opacity:0.04;
   }
   ::v-deep .marker {
-    background-image: url('../assets/mapbox-icon.png');
     background-size: cover;
     width: 20px;
     height: 32px;
@@ -694,7 +709,21 @@
     margin-left:-10px;
     margin-top:4px;
   }
+
+  ::v-deep .marker.marker--green{
+    background-image: url('../assets/marker-icon-green.png');
+  }
+
+  ::v-deep .marker.marker--red{
+    background-image: url('../assets/marker-icon-red.png');
+  }
+
+  ::v-deep .marker.marker--yellow{
+    background-image: url('../assets/marker-icon-orange.png');
+  }
+
   .login-btns {
+    cursor:pointer;
     border-left:1px solid var(--v-primary-lighten5);
     padding:0px 10px;
     > :first-child {
