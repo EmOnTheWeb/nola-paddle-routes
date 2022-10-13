@@ -23,13 +23,18 @@ export class MainMap {
     this.map.addControl(new mapboxgl.ScaleControl({unit:'imperial', position: 'top-right'}));
   }
 
-  centerOnLocation(locationCoords) {
+  centerOnLocation(locationCoords, dontZoom = false) {
 
-    this.map.flyTo({
+    let opts = {
       center:(locationCoords) ? [locationCoords.lng, locationCoords.lat] : this.originalCoords,
-      zoom:8,
-      speed: 2,
-    });
+      speed: 2
+    }; 
+
+    if (!dontZoom) {
+      opts.zoom = 8
+    }
+
+    this.map.flyTo(opts);
   }
 
   addMapMarkers(paddles, clickCallback) {

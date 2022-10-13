@@ -353,6 +353,10 @@
         this.mainMap.drawPaddleRoutes(idPaddleRoutesToShow,this.paddles,handlePaddleRouteClicked);
 
         if(paddleToggledOn) {
+          let [lng,lat] = paddle.pin;
+          let coords = {lng:lng, lat:lat};
+          let dontZoom = true;
+          this.mainMap.centerOnLocation(coords,dontZoom);
           // this.mainMap.flyToFitRouteBounds(paddle);
           // this.mainMap.showMoreInfoButton(paddle.id);
         }
