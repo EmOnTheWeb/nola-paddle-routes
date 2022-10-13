@@ -12,7 +12,7 @@ export default new Vuetify({
         secondary: '#114B5F',
         // accent: ,   '#A54657'
         warning: '#df323b',
-        accent: '#073763'
+        accent: '#334E58'
       },
     },
   },

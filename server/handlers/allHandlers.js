@@ -5,9 +5,51 @@ DOMParser = require('xmldom').DOMParser;
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
+async function addComment(req, res) {
+
+  let idPaddle = req.body.idPaddle;
+  let userId = req.session.uid;
+  let username = req.session.username;
+  let comment = req.body.comment;
+
+  const db = dbo.getDb();
+  const commentsCollection = db.collection('comments');
+
+  let thereAreCommentsForThisPaddle = await commentsCollection.findOne({idPaddle: idPaddle});
+
+  let commentObj = {
+    comment: comment,
+    uid: userId,
+    username: username,
+    dttimestamp: new Date()
+  }
+
+  if (thereAreCommentsForThisPaddle) {
+    //update existing document
+    await commentsCollection.updateOne(
+     { idPaddle:idPaddle },
+     { $push: { comments: commentObj } }
+    )
+  } else {
+    //insert new document
+    await commentsCollection.insertOne(
+      { idPaddle:idPaddle,
+        comments: [ commentObj ]
+      }
+    );
+  }
+
+  let responseObj = {
+    success: true,
+    comment: commentObj
+  }
+
+  res.send(responseObj);
+}
+
 function logout(req, res) {
   req.session.destroy(function(err) {
-    res.send({success:true}); 
+    res.send({success:true});
   });
 }
 
@@ -244,3 +286,4 @@ module.exports.addUser = addUser;
 module.exports.getUser = getUser;
 module.exports.signInUser = signInUser;
 module.exports.logout = logout;
+module.exports.addComment = addComment;

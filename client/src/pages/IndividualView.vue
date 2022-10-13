@@ -33,11 +33,20 @@
 
     <v-tabs v-model="tab">
       <v-tab>Comments</v-tab>
+      <!-- <span class="comment-login-message" v-if="!userIsLoggedIn">
+        You must be signed in to comment
+      </span> -->
+      <!-- <a @click="emitShowSignIn()">Sign In
+      </a> -->
     </v-tabs>
     <v-tabs-items v-model="tab">
       <v-tab-item
       >
-      <comments :comments="comments"></comments>
+      <comments
+        @showLoginDialog="emitShowSignIn()"
+        :comments="comments"
+        :idPaddle="paddle.id"
+        :userIsLoggedIn="userIsLoggedIn"></comments>
       </v-tab-item>
     </v-tabs-items>
 
@@ -57,12 +66,16 @@
     },
     props: {
       paddle: Object,
-      show: Boolean
+      show: Boolean,
+      userIsLoggedIn: Boolean
     },
     mounted() {
 
     },
     methods: {
+      emitShowSignIn() {
+        this.$emit('showLoginDialog');
+      },
       close() {
         this.$emit('close',true);
       },
@@ -120,9 +133,9 @@
     justify-content: flex-end;
     a {
       display:block;
-      text-decoration:none;
       font-size:14px;
-      color: var(--v-primary--base);
+      color: var(--v-accent-lighten1);
+      text-decoration:underline;
     }
   }
   .info-and-actions {
@@ -131,7 +144,6 @@
     margin-top:5px; margin-bottom:5px;
     .actions {
       padding: 5px;
-      border: 1px solid var(--v-accent-lighten1);
       border-radius: 10px;
       font-weight:bold;
     }
@@ -162,6 +174,7 @@
       border-bottom: 0px;
       border-top-left-radius: 10px;
       border-top-right-radius: 10px;
+      border:none;
     }
   }
   ::v-deep .v-tabs-slider-wrapper {
@@ -173,4 +186,11 @@
     top: 12px;
     cursor:pointer;
   }
+  // .comment-login-message {
+  //   font-size: 0.85rem;
+  //   vertical-align: middle;
+  //   line-height: 30px;
+  //   margin-left: 10px;
+  //   color: var(--v-error--darken1);
+  // }
 </style>

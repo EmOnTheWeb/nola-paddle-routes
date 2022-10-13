@@ -14,4 +14,6 @@ routes.route('/signin').post(handlers.signInUser);
 
 routes.route('/logout').post(handlers.logout);
 
+routes.route('/comment').post(handlers.addComment);
+
 module.exports = routes;

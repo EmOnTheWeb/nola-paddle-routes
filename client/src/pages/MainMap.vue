@@ -1,7 +1,12 @@
 <template>
   <div>
     <v-dialog v-model="showIndividualView" max-width="600" :hide-overlay="true">
-      <individual-view :paddle="paddleClicked" @close="showIndividualView = false"></individual-view>
+      <individual-view
+        :userIsLoggedIn="userData.isLoggedIn"
+        :paddle="paddleClicked"
+        @close="showIndividualView = false"
+        @showLoginDialog="showLoginDialog = true"
+      ></individual-view>
     </v-dialog>
     <v-dialog eager v-model="showLoginDialog" max-width="350" :hide-overlay="false">
       <login
@@ -158,7 +163,6 @@
                 <v-list-item class="mb-1">
                   <v-checkbox dense hide-details
                     v-model="aPaddleRouteIsShowing"
-                    color="accent"
                     :disabled="!aPaddleRouteIsShowing"
                     @click="hideAllRoutes()"
                   ></v-checkbox>
@@ -180,7 +184,6 @@
                     v-model="paddleRoutesShowing[paddle.id]"
                     dense
                     hide-details
-                    color="accent"
                     style="pointer-events:none;"
                   >
                   </v-checkbox>

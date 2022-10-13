@@ -10,7 +10,7 @@
        row-height="20"
        hide-details
       ></v-textarea>
-      <v-icon v-show="thereIsAComment" color="accent">mdi-send</v-icon>
+      <v-icon @click="checkLoginAndSubmitComment()" v-show="thereIsAComment" color="accent">mdi-send</v-icon>
     </div>
     <v-list-item
       v-for="(comment, index) in comments"
@@ -30,12 +30,33 @@
 </template>
 
 <script>
+  import NODE_API from '../utils/api';
+
 export default {
   props: {
-    comments: []
+    comments: [],
+    userIsLoggedIn: Boolean,
+    idPaddle: String
   },
   mounted() {
 
+  },
+  methods: {
+    checkLoginAndSubmitComment() {
+      if (!this.userIsLoggedIn) {
+        this.$emit('showLoginDialog');
+      } else {
+        let reqObj = { comment: this.comment, idPaddle: this.idPaddle };
+        NODE_API.post('/comment', reqObj).then(response => {
+          if(response.data.success === false) {
+
+          }
+        })
+        .catch(error => {
+          console.log(error);
+        });
+      }
+    }
   },
   data() {
     return {
