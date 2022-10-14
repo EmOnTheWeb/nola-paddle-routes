@@ -12,6 +12,7 @@
       ></v-textarea>
       <v-icon @click="checkLoginAndSubmitComment()" v-show="thereIsAComment" color="accent">mdi-send</v-icon>
     </div>
+    <v-overlay :value="overlay"></v-overlay>
     <template v-if="!loadingComments">
         <v-list-item
           v-for="(comment, index) in comments"
@@ -71,10 +72,12 @@ export default {
   },
   methods: {
     deleteComment(commentText, index) {
+      this.overlay = true;
       NODE_API.put('/comment', {comment:commentText, idPaddle:this.idPaddle}).then(response => {
         if (response.data.success) {
           this.comments.splice(index,1);
         }
+        this.overlay = false;
       });
     },
     getFormattedDate(isoDate) {
@@ -89,12 +92,14 @@ export default {
       if (!this.userIsLoggedIn) {
         this.$emit('showLoginDialog');
       } else {
+        this.overlay = true;
         let reqObj = { comment: this.comment, idPaddle: this.idPaddle };
         NODE_API.post('/comment', reqObj).then(response => {
           if(response.data.success) {
             this.comments.unshift(response.data.comment);
             this.comment = '';
           }
+          this.overlay = false;
         })
         .catch(error => {
           console.log(error);
@@ -107,7 +112,8 @@ export default {
       count: 0,
       comment: '',
       comments: [],
-      loadingComments: true
+      loadingComments: true,
+      overlay: false
     }
   },
   computed: {

@@ -1,5 +1,6 @@
 <template>
   <v-card>
+    <v-overlay :value="overlay"></v-overlay>
     <v-card-title>Upload Paddle</v-card-title>
     <v-icon color="accent" class="icon--close" @click="close()">mdi-close</v-icon>
     <v-card-text>
@@ -119,6 +120,8 @@
         this.$emit('close',true);
       },
       submitPaddle() {
+        this.overlay = true;
+
         let formData = {
           name: this.name,
           distance: this.distance,
@@ -135,7 +138,7 @@
           }
         }).then(response => {
           if(response.data.success) {
-            this.$router.go(); 
+            this.$router.go();
           }
         })
         .catch(error => {
@@ -156,7 +159,8 @@
       types: ['Bayou','River','Open Water'],
       valid: false,
       fileOne: null,
-      fileTwo: null
+      fileTwo: null,
+      overlay: false
     }),
   }
 </script>

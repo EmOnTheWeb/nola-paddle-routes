@@ -1,5 +1,6 @@
 <template>
   <div>
+    <v-overlay :value="overlay"></v-overlay>
     <v-dialog v-if="showIndividualView" v-model="showIndividualView" max-width="600" :hide-overlay="true">
       <individual-view
         :userIsLoggedIn="userData.isLoggedIn"
@@ -329,9 +330,11 @@
         }
       },
       logout() {
+        this.overlay = true;
         NODE_API.post('/logout').then(response => {
           this.userData = {};
           this.$set(this.userData,'isLoggedIn',false);
+          this.overlay = false; 
         })
         .catch(error => {
           console.log(error);
@@ -610,7 +613,8 @@
       showLoginDialog: false,
       userData: {},
       userDataLoaded: false,
-      showPaddleUpload: false
+      showPaddleUpload: false,
+      overlay: false
     }),
   }
 

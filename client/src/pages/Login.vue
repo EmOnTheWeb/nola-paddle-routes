@@ -1,5 +1,6 @@
 <template>
   <div>
+    <v-overlay :value="overlay"></v-overlay>
     <!--sign in form -->
     <v-card v-show="!showSignUp">
       <v-card-title>Sign in</v-card-title>
@@ -184,6 +185,8 @@
       validateAndSubmitSignin() {
         let isValid = this.$refs.signinForm.validate();
         if (isValid) {
+          this.overlay = true;
+
           let reqObj = {
             "email":this.email,
             "password":this.password
@@ -195,6 +198,7 @@
             } else {
               this.$emit('close',response.data);
             }
+            this.overlay = false; 
           })
           .catch(error => {
             console.log(error);
@@ -205,7 +209,7 @@
       validateAndSubmitSignup() {
         let isValid = this.$refs.signupForm.validate();
         if (isValid) {
-
+          this.overlay = true;
           let reqObj = {
             "username":this.signupUsername,
             "email":this.signupEmail,
@@ -219,6 +223,7 @@
               this.showSignUpSuccessMessage = true;
               this.$emit('setUserData',response.data);
             }
+            this.overlay = false;
           })
           .catch(error => {
             console.log(error);
@@ -255,7 +260,8 @@
       showSignUp: false,
       signUpErrors: [],
       showSignUpSuccessMessage: false,
-      signInErrors: []
+      signInErrors: [],
+      overlay: false
     }),
   }
 </script>
