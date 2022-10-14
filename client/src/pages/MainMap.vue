@@ -135,7 +135,7 @@
                 label="Paddle Type"
               ></v-select>
             </section>
-
+            <v-btn v-if="this.type.length !==0  || this.select" @click="clearFilters()" text-color="primary" small depressed color="transparent">clear</v-btn>
             <div class="login-btns" v-show="userDataLoaded">
               <v-btn v-if="!userData.isLoggedIn" @click="showLoginDialog = true" small depressed color="accent">Sign In</v-btn>
               <v-menu bottom offset-y open-on-hover>
@@ -169,6 +169,7 @@
           <v-col cols="2" class="d-none d-sm-block pr-0 pl-0 pt-0 pb-0">
             <v-sheet class="pt-1" style="height:100%;">
               <v-list color="transparent" text-color="primary">
+                <span style="display: block;padding-left: 10px;font-size: 14px;margin-bottom: 6px;" v-if="paddles.length">Showing {{filteredPaddles.length}} of {{paddles.length}}</span>
                 <v-list-item class="mb-1">
                   <v-checkbox dense hide-details
                     v-model="aPaddleRouteIsShowing"
@@ -316,6 +317,10 @@
       }
     },
     methods: {
+      clearFilters() {
+        this.type = [];
+        this.select = null;
+      },
       showPaddleUploadDialog() {
         if (this.userData.isLoggedIn) {
           this.showPaddleUpload = true;
