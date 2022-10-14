@@ -130,6 +130,7 @@
                 multiple
                 chips
                 dense
+                @change="hideShowMarkers()"
                 hide-details
                 label="Paddle Type"
               ></v-select>
@@ -395,9 +396,24 @@
         return paddleRoutesToShow;
       },
       hideShowMarkers() {
-
         let filteredPaddleIds = this.filteredPaddles.map((p) => p.id);
         this.mainMap.hideShowMarkers(filteredPaddleIds);
+      },
+      paddleMatchesTypeFilter(paddle) {
+        if (this.type.length === 0) {
+          return true;
+        } else {
+          if (paddle.tags) {
+            let adjustedTags = paddle.tags.map((t) => {
+              return t.toLowerCase().trim();
+            });
+
+            let isATag = (e) => adjustedTags.includes(e.toLowerCase());
+            return this.type.some(isATag);
+          } else {
+            return false;
+          }
+        }
       },
       calcCrow(coords1, coords2)  {
         //This function takes in latitude and longitude of two locations
@@ -533,38 +549,47 @@
           return [];
         }
 
-        let filteredPaddles = [];
-
-        if (!this.select) {
+        if (!this.select && this.type.length === 0) {
           return this.paddles;
         }
 
-        let { latitude, longitude } = this.select;
-        const searchCoordinates = {lat: latitude.toFixed(1), lng: longitude.toFixed(1)};
-        const resultsWithin = this.resultsWithinDistance;
+        let filteredPaddles = this.paddles;
 
-        filteredPaddles = this.paddles.filter((paddle) => {
-          let [lng,lat]= paddle.pin;
+        if (this.select) {
+          //filter by search radius
+          let { latitude, longitude } = this.select;
+          const searchCoordinates = {lat: latitude.toFixed(1), lng: longitude.toFixed(1)};
+          const resultsWithin = this.resultsWithinDistance;
 
-          const paddleCoordinates = {lat: lat.toFixed(1), lng: lng.toFixed(1)};
-          if(this.paddleWithinSearchRadius(
-            searchCoordinates,
-            resultsWithin,
-            paddleCoordinates
-          )) {
-            return true;
-          } else {
-            return false;
-          }
-        });
+          filteredPaddles = this.paddles.filter((paddle) => {
+            let [lng,lat]= paddle.pin;
+
+            const paddleCoordinates = {lat: lat.toFixed(1), lng: lng.toFixed(1)};
+            if(this.paddleWithinSearchRadius(
+              searchCoordinates,
+              resultsWithin,
+              paddleCoordinates
+            )) {
+              return true;
+            } else {
+              return false;
+            }
+          });
+        }
+
+        if (this.type.length) {
+          filteredPaddles = filteredPaddles.filter((paddle) => {
+            return this.paddleMatchesTypeFilter(paddle);
+          });
+        }
 
         return filteredPaddles;
-      }
-    },
+    }
+  },
     data: () => ({
       // distanceRange: '',
       // distanceRanges: [],
-      type: '',
+      type: [],
       types: ['Bayou','River','Open Water'],
       isGettingLocation: false,
       resultsWithinDistance: 300,

@@ -128,15 +128,15 @@
           fileOne: this.fileOne,
           fileTwo: this.fileTwo
         }
-        console.log(formData);
-        debugger;
 
         NODE_API.post('/uploadPaddle', formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
         }).then(response => {
-
+          if(response.data.success) {
+            this.$router.go(); 
+          }
         })
         .catch(error => {
           console.log(error);
