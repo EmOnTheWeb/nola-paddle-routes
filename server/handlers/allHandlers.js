@@ -19,7 +19,7 @@ async function deleteComment(req,res) {
     {$pull : {"comments" : {comment:comment,uid:userId}}}
   );
 
-  res.send({success:true}); 
+  res.send({success:true});
 }
 
 async function addComment(req, res) {
@@ -71,11 +71,12 @@ async function getComments(req, res) {
 
   let idPaddle = req.query.idPaddle;
   let comments = await commentsCollection.findOne({idPaddle:idPaddle});
+  let responseObj = {
+      success:true,
+      comments:(comments) ? comments.comments.reverse() : []
+    };
 
-  res.send({
-    success:true,
-    comments:comments.comments.reverse()
-  });
+  res.send(responseObj);
 }
 
 function logout(req, res) {

@@ -12,32 +12,45 @@
       ></v-textarea>
       <v-icon @click="checkLoginAndSubmitComment()" v-show="thereIsAComment" color="accent">mdi-send</v-icon>
     </div>
-    <v-list-item
-      v-for="(comment, index) in comments"
-      three-line
-      :key="index"
-    >
-      <v-list-item-content>
-        <v-list-item-content>
-          {{comment.comment}}
-        </v-list-item-content>
-        <v-list-item-subtitle>
-          Posted by <span class="user-posted">{{comment.username}}</span> on <span class="date-posted">{{getFormattedDate(comment.dttimestamp)}}</span>
-          <span class="delete-comment" v-if="userId == comment.uid" @click="deleteComment(comment.comment, index)">Delete</span>
-        </v-list-item-subtitle>
-      </v-list-item-content>
-    </v-list-item>
+    <template v-if="!loadingComments">
+        <v-list-item
+          v-for="(comment, index) in comments"
+          three-line
+          :key="index"
+        >
+          <v-list-item-content>
+            <v-list-item-content>
+              {{comment.comment}}
+            </v-list-item-content>
+            <v-list-item-subtitle>
+              Posted by <span class="user-posted">{{comment.username}}</span> on <span class="date-posted">{{getFormattedDate(comment.dttimestamp)}}</span>
+              <span class="delete-comment" v-if="userId == comment.uid" @click="deleteComment(comment.comment, index)">Delete</span>
+            </v-list-item-subtitle>
+          </v-list-item-content>
+        </v-list-item>
+    </template>
+    <div style="display:flex; justify-content:center;" v-else>
+      <v-progress-circular
+         indeterminate
+         color="accent"
+         class="comments-loading-spinner"
+      ></v-progress-circular>
+    </div>
   </v-list>
 </template>
 
 <script>
   import NODE_API from '../utils/api';
+  import Vue from 'vue';
 
 export default {
   props: {
     userIsLoggedIn: Boolean,
     idPaddle: String,
     userId: String
+  },
+  destroyed() {
+
   },
   mounted() {
     NODE_API.get('/comment',{
@@ -48,6 +61,9 @@ export default {
       if(response.data.success) {
         this.comments = response.data.comments;
       }
+      Vue.nextTick(() => {
+        this.loadingComments = false;
+      });
     })
     .catch(error => {
       console.log(error);
@@ -90,7 +106,8 @@ export default {
     return {
       count: 0,
       comment: '',
-      comments: []
+      comments: [],
+      loadingComments: true
     }
   },
   computed: {

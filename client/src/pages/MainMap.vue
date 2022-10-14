@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-dialog v-model="showIndividualView" max-width="600" :hide-overlay="true">
+    <v-dialog v-if="showIndividualView" v-model="showIndividualView" max-width="600" :hide-overlay="true">
       <individual-view
         :userIsLoggedIn="userData.isLoggedIn"
         :userId="userData.uid"
@@ -8,6 +8,13 @@
         @close="showIndividualView = false"
         @showLoginDialog="showLoginDialog = true"
       ></individual-view>
+    </v-dialog>
+    <v-dialog v-if="showPaddleUpload" v-model="showPaddleUpload" max-width="350" :hide-overlay="true">
+      <paddle-upload
+        :userIsLoggedIn="userData.isLoggedIn"
+        :userId="userData.uid"
+        @close="showPaddleUpload = false"
+      ></paddle-upload>
     </v-dialog>
     <v-dialog eager v-model="showLoginDialog" max-width="350" :hide-overlay="false">
       <login
@@ -168,10 +175,12 @@
                     @click="hideAllRoutes()"
                   ></v-checkbox>
                   <h4 style="font-weight:500;">Paddles</h4>
-                  <!-- <v-icon
-                    color="primary">
-                    mdi-close-box-outline
-                  </v-icon> -->
+                  <v-icon
+                    class="upload-btn"
+                    color="primary"
+                    @click="showPaddleUploadDialog()">
+                    mdi-upload
+                  </v-icon>
                 </v-list-item>
                 <v-list-item
                   v-for="(paddle, index) in filteredPaddles"
@@ -258,6 +267,7 @@
   import {MainMap} from '../utils/mainMap';
   import {LouisianaTowns} from '../assets/louisianaTowns.js';
   import IndividualView from '../pages/IndividualView.vue';
+  import PaddleUpload from '../pages/PaddleUpload.vue';
   import Login from '../pages/Login.vue';
   import NODE_API from '../utils/api';
   import Vue from 'vue';
@@ -267,7 +277,8 @@
   export default {
     components: {
       IndividualView,
-      Login
+      Login,
+      PaddleUpload
     },
     created() {
 
@@ -304,6 +315,13 @@
       }
     },
     methods: {
+      showPaddleUploadDialog() {
+        if (this.userData.isLoggedIn) {
+          this.showPaddleUpload = true;
+        } else {
+          this.showLoginDialog = true;
+        }
+      },
       logout() {
         NODE_API.post('/logout').then(response => {
           this.userData = {};
@@ -338,7 +356,7 @@
         this.paddleRoutesShowing = {};
         this.mainMap.removeAllRoutes();
       },
-      togglePaddleRoute(paddle) {
+      togglePaddleRoute(paddle,clickOriginatedOnPin = false) {
 
         let paddleToggledOn = false;
         if(!this.paddleRoutesShowing.hasOwnProperty(paddle.id) || this.paddleRoutesShowing[paddle.id] === false) {
@@ -360,7 +378,9 @@
           let [lng,lat] = paddle.pin;
           let coords = {lng:lng, lat:lat};
           let dontZoom = true;
-          this.mainMap.centerOnLocation(coords,dontZoom);
+          if (!clickOriginatedOnPin) {
+            this.mainMap.centerOnLocation(coords,dontZoom);
+          }
           // this.mainMap.flyToFitRouteBounds(paddle);
           // this.mainMap.showMoreInfoButton(paddle.id);
         }
@@ -500,7 +520,8 @@
             this.paddleClicked=clickedPaddle;
             this.showIndividualView=true;
           } else {
-            this.togglePaddleRoute(clickedPaddle);
+            let clickOriginatedOnPin = true;
+            this.togglePaddleRoute(clickedPaddle,clickOriginatedOnPin);
           }
         }
 
@@ -558,7 +579,8 @@
       paddleClicked: {},
       showLoginDialog: false,
       userData: {},
-      userDataLoaded: false
+      userDataLoaded: false,
+      showPaddleUpload: false
     }),
   }
 
@@ -744,5 +766,10 @@
     font-size:1.2rem;
     color:var(--v-accent-base);
     font-weight:500
+  }
+  .upload-btn {
+    margin-left:auto;
+    cursor:pointer;
+    display:block;
   }
 </style>

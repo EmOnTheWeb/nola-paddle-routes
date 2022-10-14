@@ -58,7 +58,7 @@
 <script>
 
   import {MainMap} from '../utils/mainMap';
-  import Comments from '../components/Comments.vue'
+  import Comments from '../components/Comments.vue'; 
 
   export default {
     name: 'IndividualView',
@@ -72,7 +72,6 @@
       userId: String
     },
     mounted() {
-      console.log('i mounted');
     },
     methods: {
       emitShowSignIn() {
