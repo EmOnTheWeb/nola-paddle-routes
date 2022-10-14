@@ -63,19 +63,20 @@
           chips
           v-model="fileOne"
           small-chips
-          hint="Upload route gpx or kml file"
+          hint="Upload route gpx or kml file."
           filled
           required
           outlined
           persistent-hint
           dense
+          accept=".gpx,.kml"
         ></v-file-input>
         <v-file-input
           label="Route"
           chips
           v-model="fileTwo"
           small-chips
-          hint="Upload additional route gpx or kml file"
+          hint="If there is a second file for this route upload it here."
           filled
           outlined
           persistent-hint

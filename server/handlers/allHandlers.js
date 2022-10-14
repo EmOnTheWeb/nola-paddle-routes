@@ -313,22 +313,14 @@ function importRawData(req,res) {
   });
 }
 
-function addPaddle(req,res) {
-
-  const form = formidable({});
-
-  form.parse(req, (err, fields, files) => {
-    if (err) {
-      next(err);
-      return;
-    }
-
-    let tempFilePath = files.fileOne.filepath;
-    const destFilePath = process.cwd()+ '/rawData' + '/' + files.fileOne.originalFilename;
-    //add the file to the folder on the server
+function uploadFileAndExtractRouteCoordinates(tempFilePath,destFilePath) {
+  return new Promise ((resolve,reject) => {
     fs.rename(tempFilePath, destFilePath, async (err) => {
-        if (err) throw err;
-        console.log('file successfully uploaded');
+
+      if (err) throw err;
+
+      console.log('file successfully uploaded');
+
         //now extract the route coordinates from the file
         let parts = destFilePath.split('.');
         let ext = parts[parts.length - 1];
@@ -346,38 +338,77 @@ function addPaddle(req,res) {
           return feature.geometry.type == "LineString";
         });
 
-        let theCoords = theRouteObj.geometry.coordinates;
-
-        console.log(theCoords);
-        let tags = [fields.type].concat(fields.tags.split(','));
-
-        let newPaddleObj = {
-          name: fields.name,
-          distance: fields.distance,
-          launchType: fields.boatLaunchType,
-          tags: tags,
-          route: theCoords
-        }
-
-        //insert paddle
-        const db = dbo.getDb();
-        const paddlesCollection = db.collection('paddles');
-
-        await paddlesCollection.insertOne(
-          newPaddleObj
-        );
+        resolve(theRouteObj.geometry.coordinates);
     });
-
-
-    //         var tempFilePath = files.filetoupload.filepath;
-    // console.log(fields);
-    // console.log(files);
-    //
-    //
-    //
-    // name ,route , distance, tags, boatlaunchtype
   });
+}
 
+
+function addPaddle(req,res,next) {
+
+  const form = formidable({});
+
+  form.parse(req, async (err, fields, files) => {
+    if (err) {
+      next(err);
+      return;
+    }
+
+    let tempFilePath = files.fileOne.filepath;
+    const destFilePath = process.cwd()+ '/rawData' + '/' + files.fileOne.originalFilename;
+    //add the file to the folder on the server
+
+    let theCoords = await uploadFileAndExtractRouteCoordinates(tempFilePath, destFilePath);
+
+    let tags = [fields.type].concat(fields.tags.split(','));
+
+    let newPaddleObj = {
+      name: fields.name,
+      distance: fields.distance,
+      launchType: fields.boatLaunchType,
+      tags: tags,
+      route: theCoords,
+      uid: req.session.uid,
+      dttimestamp: new Date()
+    }
+
+    if (files.fileTwo) {
+      //this is a multi paddle
+      newPaddleObj.multi = true;
+    }
+    //insert paddle
+    const db = dbo.getDb();
+    const paddlesCollection = db.collection('paddles');
+
+    let newlyAdded = await paddlesCollection.insertOne(
+      newPaddleObj
+    );
+
+    console.log('...added paddle to database');
+
+    if (files.fileTwo) {
+      //add the child paddle obj with the second route part
+      let tempFilePathTwo = files.fileTwo.filepath;
+      const destFilePathTwo = process.cwd()+ '/rawData' + '/' + files.fileTwo.originalFilename;
+      let theCoordsTwo = await uploadFileAndExtractRouteCoordinates(tempFilePathTwo, destFilePathTwo);
+
+      let childPaddleObj = {
+        multi:true,
+        idParent: newlyAdded.insertedId.toString(),
+        route: theCoordsTwo,
+        uid: req.session.uid,
+        dttimestamp: new Date()
+      }
+
+      let newlyAddedSecondPart = await paddlesCollection.insertOne(
+        childPaddleObj
+      );
+
+      console.log('...added second part of paddle to database');
+    }
+
+    res.send({success:true});
+  });
 }
 
 module.exports.importRawData = importRawData;
