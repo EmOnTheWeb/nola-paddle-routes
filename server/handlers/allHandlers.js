@@ -2,7 +2,8 @@ const dbo = require('../db/conn');
 const fs = require('fs');
 const tj = require('@mapbox/togeojson');
 DOMParser = require('xmldom').DOMParser;
-const bcrypt = require('bcrypt');
+const formidable = require('formidable');
+const bcrypt = require('bcryptjs');
 const saltRounds = 10;
 
 async function deleteComment(req,res) {
@@ -312,6 +313,73 @@ function importRawData(req,res) {
   });
 }
 
+function addPaddle(req,res) {
+
+  const form = formidable({});
+
+  form.parse(req, (err, fields, files) => {
+    if (err) {
+      next(err);
+      return;
+    }
+
+    let tempFilePath = files.fileOne.filepath;
+    const destFilePath = process.cwd()+ '/rawData' + '/' + files.fileOne.originalFilename;
+    //add the file to the folder on the server
+    fs.rename(tempFilePath, destFilePath, async (err) => {
+        if (err) throw err;
+        console.log('file successfully uploaded');
+        //now extract the route coordinates from the file
+        let parts = destFilePath.split('.');
+        let ext = parts[parts.length - 1];
+
+        let fileContents = new DOMParser().parseFromString(fs.readFileSync(destFilePath, 'utf8'));
+        let theGeoJson;
+        if(ext === 'kml') {
+          theGeoJson = tj.kml(fileContents);
+        }
+        if (ext === 'gpx') {
+          theGeoJson = tj.gpx(fileContents);
+        }
+
+        let theRouteObj = theGeoJson.features.find((feature) => {
+          return feature.geometry.type == "LineString";
+        });
+
+        let theCoords = theRouteObj.geometry.coordinates;
+
+        console.log(theCoords);
+        let tags = [fields.type].concat(fields.tags.split(','));
+
+        let newPaddleObj = {
+          name: fields.name,
+          distance: fields.distance,
+          launchType: fields.boatLaunchType,
+          tags: tags,
+          route: theCoords
+        }
+
+        //insert paddle
+        const db = dbo.getDb();
+        const paddlesCollection = db.collection('paddles');
+
+        await paddlesCollection.insertOne(
+          newPaddleObj
+        );
+    });
+
+
+    //         var tempFilePath = files.filetoupload.filepath;
+    // console.log(fields);
+    // console.log(files);
+    //
+    //
+    //
+    // name ,route , distance, tags, boatlaunchtype
+  });
+
+}
+
 module.exports.importRawData = importRawData;
 module.exports.getRouteNamesAndStartCoordinates = getRouteNamesAndStartCoordinates;
 module.exports.addUser = addUser;
@@ -321,3 +389,4 @@ module.exports.logout = logout;
 module.exports.addComment = addComment;
 module.exports.getComments = getComments;
 module.exports.deleteComment = deleteComment;
+module.exports.addPaddle = addPaddle;

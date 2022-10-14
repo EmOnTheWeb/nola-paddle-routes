@@ -22,6 +22,7 @@
           outlined
           single-line
           dense
+          required
           hide-details
           type="number"
           suffix="miles"
@@ -32,6 +33,7 @@
           class="mb-4"
           filled
           outlined
+          required
           single-line
           hide-details
           dense
@@ -42,7 +44,6 @@
           filled
           class="mb-4"
           outlined
-          multiple
           hide-details
           chips
           dense
@@ -60,9 +61,11 @@
         <v-file-input
           label="Route"
           chips
+          v-model="fileOne"
           small-chips
           hint="Upload route gpx or kml file"
           filled
+          required
           outlined
           persistent-hint
           dense
@@ -70,6 +73,7 @@
         <v-file-input
           label="Route"
           chips
+          v-model="fileTwo"
           small-chips
           hint="Upload additional route gpx or kml file"
           filled
@@ -95,6 +99,7 @@
 <script>
 
   import {MainMap} from '../utils/mainMap';
+  import NODE_API from '../utils/api';
 
   export default {
     name: 'PaddleUpload',
@@ -102,7 +107,6 @@
 
     },
     props: {
-      paddle: Object,
       show: Boolean,
       userIsLoggedIn: Boolean,
       userId: String
@@ -114,7 +118,28 @@
         this.$emit('close',true);
       },
       submitPaddle() {
+        let formData = {
+          name: this.name,
+          distance: this.distance,
+          boatLaunchType: this.boatLaunchType,
+          type: this.type,
+          tags: this.tags,
+          fileOne: this.fileOne,
+          fileTwo: this.fileTwo
+        }
+        console.log(formData);
+        debugger;
 
+        NODE_API.post('/uploadPaddle', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }).then(response => {
+
+        })
+        .catch(error => {
+          console.log(error);
+        });
 
       }
     },
@@ -128,7 +153,9 @@
       tags: '',
       type: '',
       types: ['Bayou','River','Open Water'],
-      valid: false
+      valid: false,
+      fileOne: null,
+      fileTwo: null
     }),
   }
 </script>
