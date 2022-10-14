@@ -6,7 +6,7 @@
       <div class="info-and-actions">
         <div>
           <p><span style="font-weight:bold;margin-right:5px;">Distance:</span>{{paddle.distance}}&nbsp;miles</p>
-          <p><span style="font-weight:bold;margin-right:5px;">Boat Launch Type:</span>blt</p>
+          <p><span style="font-weight:bold;margin-right:5px;">Boat Launch Type:</span>{{paddle.launchType}}</p>
         </div>
         <div class="actions">
           <a @click="generateAndExportGPXFile()">Export Route
@@ -58,7 +58,7 @@
 <script>
 
   import {MainMap} from '../utils/mainMap';
-  import Comments from '../components/Comments.vue'; 
+  import Comments from '../components/Comments.vue';
 
   export default {
     name: 'IndividualView',
