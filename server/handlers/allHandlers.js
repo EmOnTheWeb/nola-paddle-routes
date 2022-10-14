@@ -178,7 +178,8 @@ async function addUser(req,res) {
         {
           'username':username,
           'email':email,
-          'password':hash
+          'password':hash,
+          'dttimestamp': new Date()
         }
       );
       req.session.loggedIn = true;
