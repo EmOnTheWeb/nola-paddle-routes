@@ -3,31 +3,29 @@
     <v-card-title>{{paddle.name}}</v-card-title>
     <v-icon color="accent" class="icon--close" @click="close()">mdi-close</v-icon>
     <v-card-text>
-      <div class="info-and-actions">
-        <div>
-          <p><span style="font-weight:bold;margin-right:5px;">Distance:</span>{{paddle.distance}}&nbsp;miles</p>
-          <p><span style="font-weight:bold;margin-right:5px;">Boat Launch Type:</span>{{paddle.launchType}}</p>
-        </div>
-        <div class="actions">
-          <a @click="generateAndExportGPXFile()">Export Route
-            <!-- <v-icon color="primary">
-            mdi-file-export-outline
-            </v-icon> -->
-          </a>
-          <a target="_blank" :href="drivingDirectionsHref">Driving Directions</a>
-        </div>
-      </div>
+    <div class="info-block">
+      <p><span style="font-weight:bold;margin-right:5px;">Distance:</span>{{paddle.distance}}&nbsp;miles</p>
+      <p><span style="font-weight:bold;margin-right:5px;">Boat Launch Type:</span>{{paddle.launchType}}</p>
+
       <p>{{paddle.description}}</p>
 
-        <div class="tags">
-          <v-chip
-            v-for="(tag,index) in paddle.tags"
-            :key="index"
-          >
-            {{tag}}
-          </v-chip>
-        </div>
-
+      <div class="tags">
+        <v-chip
+          v-for="(tag,index) in paddle.tags"
+          :key="index"
+        >
+          {{tag}}
+        </v-chip>
+      </div>
+    </div>
+    <div class="actions">
+      <a @click="generateAndExportGPXFile()">
+        <v-icon color="accent">mdi-export</v-icon>&nbsp;Export Route
+      </a>
+      <a target="_blank" :href="drivingDirectionsHref">
+        <v-icon color="accent">mdi-car</v-icon>&nbsp;Get Directions
+      </a>
+    </div>
 
     </v-card-text>
 
@@ -131,23 +129,22 @@
   .actions {
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
+    justify-content: center;
+    margin-top: 30px;
     a {
-      display:block;
+      display:flex; align-items:center;
       font-size:14px;
-      color: var(--v-accent-lighten1);
-      text-decoration:underline;
+      color: var(--v-accent-base);
+      text-decoration:none;
+      font-weight:500;
+      margin-bottom:5px;
+    }
+    a + a {
+      margin-bottom:0px; 
     }
   }
-  .info-and-actions {
-    display:flex;
-    justify-content:space-between;
+  .info {
     margin-top:5px; margin-bottom:5px;
-    .actions {
-      padding: 5px;
-      border-radius: 10px;
-      font-weight:bold;
-    }
   }
   .v-application .v-card {
     color: var(--v-primary--base);
@@ -188,6 +185,9 @@
     right: 10px;
     top: 12px;
     cursor:pointer;
+  }
+  .info-block {
+
   }
   // .comment-login-message {
   //   font-size: 0.85rem;
