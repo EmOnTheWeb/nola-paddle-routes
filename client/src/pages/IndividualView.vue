@@ -136,7 +136,7 @@
       color: var(--v-accent-base);
       text-decoration:none;
       font-weight:500;
-      margin-bottom:5px;
+      margin-bottom:3px;
     }
     a + a {
       margin-bottom:0px;
