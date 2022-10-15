@@ -36,7 +36,7 @@ app.use(sessions(
 
 const corsOpts = {
   credentials: true,
-  origin: 'http://localhost:8080'
+  origin: process.env.ORIGIN
 }
 app.use(cors(corsOpts));
 app.use(express.json());
