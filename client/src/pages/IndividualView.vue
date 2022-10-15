@@ -79,10 +79,9 @@
         this.$emit('close',true);
       },
       generateAndExportGPXFile() {
-
         let result = '<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="runtracker"><metadata/><trk><name></name><desc></desc>';
         result += '<trkseg>';
-        let coords = geoJson.features[0].geometry.coordinates;
+        let coords = this.paddle.route;
         result += coords.reduce((accum,curr) => {
           let ptTag = `<trkpt lat="${curr[1]}" lon="${curr[0]}"></trkpt>`;
           return accum += ptTag;
@@ -92,7 +91,7 @@
 
         const url = 'data:text/json;charset=utf-8,' + result;
         const link = document.createElement('a');
-        link.download = `${this.$route.params.name}.gpx`;
+        link.download = `${this.paddle.name}.gpx`;
         link.href = url;
         document.body.appendChild(link);
         link.click();
@@ -140,7 +139,7 @@
       margin-bottom:5px;
     }
     a + a {
-      margin-bottom:0px; 
+      margin-bottom:0px;
     }
   }
   .info {
