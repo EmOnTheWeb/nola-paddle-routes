@@ -30,7 +30,7 @@
           </v-list-item-content>
         </v-list-item>
     </template>
-    <div style="display:flex; justify-content:center;" v-else>
+    <div style="position:absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);" v-else>
       <v-progress-circular
          indeterminate
          color="accent"

@@ -26,6 +26,7 @@
             v-model="password"
             :rules="passwordRules"
             label="Password"
+            type="password"
             class="mb-2"
             required
             filled
@@ -101,6 +102,7 @@
               :rules="passwordRules"
               label="Password"
               class="mb-2"
+              type="password"
               required
               filled
               outlined
@@ -198,7 +200,7 @@
             } else {
               this.$emit('close',response.data);
             }
-            this.overlay = false; 
+            this.overlay = false;
           })
           .catch(error => {
             console.log(error);

@@ -23,13 +23,15 @@
         @setUserData="(data) => setUserData(data)">
       </login>
     </v-dialog>
+    <!-- desktop app bar-->
     <v-app-bar
       app
       color="white"
       flat
+      class="d-none d-md-block"
     >
       <v-container fluid class="pa-0 fill-height">
-        <v-col cols="2" class="d-none d-sm-flex" style="flex-wrap:wrap; ">
+        <v-col cols="2" style="flex-wrap:wrap; ">
 
         </v-col>
         <v-col cols="10" >
@@ -42,7 +44,7 @@
                   item-text="name"
                   item-value="location"
                   cache-items
-                  class="mr-2 mb-0 mr-sm-2"
+                  class="mb-0 mr-md-2"
                   flat
                   dense
                   hide-no-data
@@ -141,7 +143,7 @@
               <v-btn v-if="!userData.isLoggedIn" @click="showLoginDialog = true" small depressed color="accent">Sign In</v-btn>
               <v-menu bottom offset-y open-on-hover>
                 <template v-slot:activator="{ on, attrs }">
-                  <span v-show="userData.isLoggedIn" v-bind="attrs" v-on="on">
+                  <span style="display:flex; align-items:center;" v-show="userData.isLoggedIn" v-bind="attrs" v-on="on">
                     <v-icon
                       dark
                       color="accent"
@@ -163,11 +165,190 @@
 
       </v-container>
     </v-app-bar>
+    <!-- mobile app bar-->
+    <v-navigation-drawer
+        v-model="mobileDrawer"
+        absolute
+        left
+      >
+      <v-list color="transparent" text-color="primary">
+        <span style="display: block;padding-left: 10px;font-size: 14px;margin-bottom: 6px;" v-if="paddles.length">Showing {{filteredPaddles.length}} of {{paddles.length}}</span>
+        <v-list-item class="mb-1">
+          <v-checkbox dense hide-details
+            v-model="aPaddleRouteIsShowing"
+            :disabled="!aPaddleRouteIsShowing"
+            @click="hideAllRoutes()"
+          ></v-checkbox>
+          <h4 style="font-weight:500;">Paddles</h4>
+          <v-icon
+            class="upload-btn"
+            color="primary"
+            @click="showPaddleUploadDialog()">
+            mdi-upload
+          </v-icon>
+        </v-list-item>
+        <v-list-item
+          v-for="(paddle, index) in filteredPaddles"
+          :key="index"
+          link
+          min-height="0"
+          @click="togglePaddleRoute(paddle)"
+          :class="paddleRoutesShowing[paddle.id] ? 'route-showing':''"
+        >
+          <v-checkbox
+            v-model="paddleRoutesShowing[paddle.id]"
+            dense
+            hide-details
+            style="pointer-events:none;"
+          >
+          </v-checkbox>
+          <v-list-item-content @click="(evt)=>ifRouteShowingShowIndividualView(paddle,evt)">
+            <v-list-item-title>
+              {{ paddle.name }}
+            </v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+    </v-navigation-drawer>
+    <v-app-bar
+      app
+      color="white"
+      flat
+      class="d-md-none v-app-bar--mobile"
+    >
+      <v-container fluid class="pa-0 fill-height">
+        <v-icon
+         color="accent"
+         style="cursor:pointer;margin-right: auto;margin-left: 10px;"
+         @click="mobileDrawer = !mobileDrawer">
+         mdi-menu
+        </v-icon>
+        <v-menu
+          bottom
+          left
+          offset-y
+         :close-on-content-click="false"
+        >
+        <template v-slot:activator="{ on, attrs }">
+          <v-icon
+           v-bind="attrs"
+           v-on="on"
+           color="accent"
+           style="cursor:pointer;">
+           mdi-filter-variant
+          </v-icon>
+        </template>
+        <div class="mobile-filters">
+          <section class="filter--location">
+            <v-autocomplete
+              v-model="select"
+              @change="hideShowMarkers()"
+              :items="items"
+              item-text="name"
+              item-value="location"
+              cache-items
+              class="mb-0"
+              flat
+              dense
+              hide-no-data
+              hide-details
+              outlined
+              label="Location"
+              solo-inverted
+              min-height="28"
+            >
+              <template v-slot:selection="data">
+                {{data.item.name}}, {{data.item.adminCode}}
+                <span style="font-size:0.8rem;position:absolute;right:30px;" v-if="data">&nbsp;&nbsp;(within {{resultsWithinDistance}} miles)</span>
+              </template>
+              <template v-slot:item="data">
+                  {{ data.item.name }}, {{ data.item.adminCode }}
+              </template>
+            </v-autocomplete>
+            <v-btn
+             class="icon-btn-locate"
+             small
+             color="transparent"
+             depressed
+             @click="useCurrentLocation()"
+             title="Get your location to use in the search bar"
+             >
+             <!-- <span class="d-none d-sm-inline">use my location</span> -->
+               <v-icon
+                 dark
+                 color="accent"
+                 v-show="!isGettingLocation"
+                 >
+                 mdi-crosshairs-gps
+               </v-icon>
+               <v-progress-circular
+                  v-show="isGettingLocation"
+                  indeterminate
+                  size="18"
+                  width="2"
+                  color="accent"
+                ></v-progress-circular>
+              </v-btn>
+            </section>
+            <div class="filter--location__slider">
+              <span style="font-size: 0.8rem;width: 105px;line-height:1;">
+                Show results within <span class="results-within-number">{{resultsWithinDistance}}</span> miles
+              </span>
 
+              <v-slider
+               v-model="resultsWithinDistance"
+               step="10"
+               ticks
+               tick-size="2"
+               color="accent"
+               height="25"
+                max="300"
+                min="0"
+                @input="hideShowMarkers"
+              ></v-slider>
+            </div>
+            <section class="filter--tags">
+              <v-select
+                v-model="type"
+                :items="this.types"
+                filled
+                outlined
+                multiple
+                chips
+                dense
+                @change="hideShowMarkers()"
+                hide-details
+                label="Paddle Type"
+              ></v-select>
+            </section>
+          </div>
+        </v-menu>
+        <v-menu bottom offset-y class="mobile-account">
+          <template v-slot:activator="{ on, attrs }">
+            <span style="display:flex; align-items:center;" v-bind="attrs" v-on="on">
+              <v-icon
+                dark
+                color="accent"
+                >
+                mdi-account
+              </v-icon>
+            </span>
+          </template>
+          <v-list>
+            <v-list-item v-if="userData.isLoggedIn" @click="logout()">
+              <v-list-item-title>Logout</v-list-item-title>
+            </v-list-item>
+            <v-list-item v-else @click="logout()">
+              <v-list-item-title v-if="!userData.isLoggedIn" @click="showLoginDialog = true" small depressed color="accent">Sign In</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
+      </v-container>
+    </v-app-bar>
     <v-main class="grey lighten-3 main-map">
       <v-container fluid>
         <v-row>
-          <v-col cols="2" class="d-none d-sm-block pr-0 pl-0 pt-0 pb-0">
+          <v-col cols="2" class="d-none d-md-block pr-0 pl-0 pt-0 pb-0">
             <v-sheet class="pt-1" style="height:100%;">
               <v-list color="transparent" text-color="primary">
                 <span style="display: block;padding-left: 10px;font-size: 14px;margin-bottom: 6px;" v-if="paddles.length">Showing {{filteredPaddles.length}} of {{paddles.length}}</span>
@@ -210,7 +391,7 @@
             </v-sheet>
           </v-col>
 
-          <v-col cols="12" sm="10" class="pr-0 pl-0 pt-0 pb-0">
+          <v-col cols="12" md="10" class="pr-0 pl-0 pt-0 pb-0">
             <v-sheet
               height="calc(100vh - 52px)"
               rounded="lg"
@@ -334,7 +515,7 @@
         NODE_API.post('/logout').then(response => {
           this.userData = {};
           this.$set(this.userData,'isLoggedIn',false);
-          this.overlay = false; 
+          this.overlay = false;
         })
         .catch(error => {
           console.log(error);
@@ -614,7 +795,8 @@
       userData: {},
       userDataLoaded: false,
       showPaddleUpload: false,
-      overlay: false
+      overlay: false,
+      mobileDrawer: false
     }),
   }
 
@@ -647,6 +829,7 @@
   .toolbar-row {
     align-items:center;
     justify-content:space-between;
+    flex-wrap:nowrap;
     & + .toolbar-row {
       padding-top:2px;
     }
@@ -745,6 +928,7 @@
   }
   .filter--tags {
     width:300px;
+    margin-left: 8px;
   }
   .v-autocomplete ::v-deep .v-select__slot{
     padding-left:25px;
@@ -805,5 +989,29 @@
     margin-left:auto;
     cursor:pointer;
     display:block;
+  }
+  /* mobile styles */
+  .mobile-filters {
+    padding:10px;
+    background:white;
+    .filter--location__slider {
+      padding:10px; padding-left:0px;
+      width:auto;
+    }
+    .filter--tags {
+      margin-left:0px;
+      width:auto;
+    }
+  }
+  .v-app-bar--mobile {
+    .container {
+      justify-content:flex-end;
+      .v-icon {
+        margin-right:10px;
+      }
+    }
+  }
+  .v-navigation-drawer--is-mobile {
+    z-index: 8;
   }
 </style>
