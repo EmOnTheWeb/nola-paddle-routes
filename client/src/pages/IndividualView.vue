@@ -19,11 +19,24 @@
       </div>
     </div>
     <div class="actions">
-      <a @click="generateAndExportGPXFile()">
+      <v-btn
+       class="icon-btn-locate"
+       small
+       color="accent"
+       depressed
+       @click="generateAndExportGPXFile()"
+       >
         <v-icon color="accent">mdi-export</v-icon>&nbsp;Export Route
-      </a>
+      </v-btn>
       <a target="_blank" :href="drivingDirectionsHref">
+        <v-btn
+         class="icon-btn-locate"
+         small
+         color="accent"
+         depressed
+         >
         <v-icon color="accent">mdi-car</v-icon>&nbsp;Get Directions
+        </v-btn>
       </a>
     </div>
 
@@ -126,20 +139,18 @@
     }
   }
   .actions {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    margin-top: 30px;
-    a {
-      display:flex; align-items:center;
-      font-size:14px;
-      color: var(--v-accent-base);
-      text-decoration:none;
-      font-weight:500;
-      margin-bottom:3px;
+    margin-top: 15px;
+
+    .v-btn {
+      padding:7px!important;
+      margin-right:10px;
+      margin-bottom:5px;
+      & + .v-btn {
+        margin-right:0px;
+      }
     }
-    a + a {
-      margin-bottom:0px;
+    i {
+      color:white!important;
     }
   }
   .info {
