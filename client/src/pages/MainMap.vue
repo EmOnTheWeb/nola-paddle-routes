@@ -473,7 +473,6 @@
 
       NODE_API.get('/getMapPins').then(response => {
         this.paddles = response.data;
-
         // this.paddles.forEach((p) => {
         //   var line = helpers.lineString(p.route);
         //   let theLength = length(line, {units: 'miles'});
@@ -492,6 +491,7 @@
       try {
         this.mainMap = new MainMap();
         await this.mainMap.initMap();
+        this.mapIsInitialized = true;
       } catch (error) {
         console.error(error);
       } finally {
@@ -499,6 +499,14 @@
       }
     },
     methods: {
+      checkForRouteParam() {
+        let routeParam = this.$route.query.route;
+        if (routeParam) {
+          let paddle = this.paddles.find((p) => p.urlName == routeParam);
+          this.mainMap.flyToFitRouteBounds(paddle);
+          this.togglePaddleRoute(paddle,true); 
+        }
+      },
       clearFilters() {
         this.type = [];
         this.select = null;
@@ -796,11 +804,26 @@
       userDataLoaded: false,
       showPaddleUpload: false,
       overlay: false,
-      mobileDrawer: false
+      mobileDrawer: false,
+      mapIsInitialized: false
     }),
+    watch: {
+      paddles(newVal,oldVal) {
+        if (newVal.length) {
+          if (this.mapIsInitialized) {
+            this.checkForRouteParam();
+          }
+        }
+      },
+      mapIsInitialized(newVal,oldVal) {
+        if (newVal === true) {
+          if (this.paddles.length) {
+            this.checkForRouteParam();
+          }
+        }
+      }
+    }
   }
-
-
 </script>
 
 <style lang="scss" scoped>

@@ -1,69 +1,91 @@
 <template>
-  <v-card>
-    <v-card-title>{{paddle.name}}</v-card-title>
-    <v-icon color="accent" class="icon--close" @click="close()">mdi-close</v-icon>
-    <v-card-text>
-    <div class="info-block">
-      <p><span style="font-weight:bold;margin-right:5px;">Distance:</span>{{paddle.distance}}&nbsp;miles</p>
-      <p><span style="font-weight:bold;margin-right:5px;">Boat Launch Type:</span>{{paddle.launchType}}</p>
+  <div>
+    <v-dialog
+      v-if="showShareLink"
+      v-model="showShareLink"
+      max-width="500"
+      :hide-overlay="true"
+      background="white">
+      <v-card class="share-link-content">
+        <v-icon color="accent" class="icon--close" @click="showShareLink = false">mdi-close</v-icon>
+        Share this url to bring up the map zoomed in on this paddle.
+        <div>
+          {{paddleLink}}
+          <v-spacer></v-spacer>
+          <v-icon v-if="!urlCopied" color="accent" @click="copyURL">mdi-card-multiple-outline</v-icon>
+          <v-icon v-if="urlCopied" color="accent" >mdi-check</v-icon>
+        </div>
+      </v-card>
+    </v-dialog>
+    <v-card>
+      <v-card-title>
+        {{paddle.name}}
+        <v-icon @click="showShareLink = true" style="margin-left:10px;cursor:pointer;" color="accent">mdi-share</v-icon>
+      </v-card-title>
+      <v-icon color="accent" class="icon--close" @click="close()">mdi-close</v-icon>
+      <v-card-text>
+      <div class="info-block">
+        <p><span style="font-weight:bold;margin-right:5px;">Distance:</span>{{paddle.distance}}&nbsp;miles</p>
+        <p><span style="font-weight:bold;margin-right:5px;">Boat Launch Type:</span>{{paddle.launchType}}</p>
 
-      <p>{{paddle.description}}</p>
+        <p>{{paddle.description}}</p>
 
-      <div class="tags">
-        <v-chip
-          v-for="(tag,index) in paddle.tags"
-          :key="index"
-        >
-          {{tag}}
-        </v-chip>
+        <div class="tags">
+          <v-chip
+            v-for="(tag,index) in paddle.tags"
+            :key="index"
+          >
+            {{tag}}
+          </v-chip>
+        </div>
       </div>
-    </div>
-    <div class="actions">
-      <v-btn
-       class="icon-btn-locate"
-       small
-       color="accent"
-       depressed
-       @click="generateAndExportGPXFile()"
-       >
-        <v-icon color="accent">mdi-export</v-icon>&nbsp;Export Route
-      </v-btn>
-      <a target="_blank" :href="drivingDirectionsHref">
+      <div class="actions">
         <v-btn
          class="icon-btn-locate"
          small
          color="accent"
          depressed
+         @click="generateAndExportGPXFile()"
          >
-        <v-icon color="accent">mdi-car</v-icon>&nbsp;Get Directions
+          <v-icon color="accent">mdi-export</v-icon>&nbsp;Export Route
         </v-btn>
-      </a>
-    </div>
+        <a target="_blank" :href="drivingDirectionsHref">
+          <v-btn
+           class="icon-btn-locate"
+           small
+           color="accent"
+           depressed
+           >
+          <v-icon color="accent">mdi-car</v-icon>&nbsp;Get Directions
+          </v-btn>
+        </a>
+      </div>
 
-    </v-card-text>
+      </v-card-text>
 
-    <v-tabs v-model="tab">
-      <v-tab>Comments</v-tab>
-      <!-- <span class="comment-login-message" v-if="!userIsLoggedIn">
-        You must be signed in to comment
-      </span> -->
-      <!-- <a @click="emitShowSignIn()">Sign In
-      </a> -->
-    </v-tabs>
-    <v-tabs-items v-model="tab">
-      <v-tab-item
-      >
-      <comments
-        @showLoginDialog="emitShowSignIn()"
-        :comments="comments"
-        :idPaddle="paddle.id"
-        :userIsLoggedIn="userIsLoggedIn"
-        :userId="userId"></comments>
-      </v-tab-item>
-    </v-tabs-items>
+      <v-tabs v-model="tab">
+        <v-tab>Comments</v-tab>
+        <!-- <span class="comment-login-message" v-if="!userIsLoggedIn">
+          You must be signed in to comment
+        </span> -->
+        <!-- <a @click="emitShowSignIn()">Sign In
+        </a> -->
+      </v-tabs>
+      <v-tabs-items v-model="tab">
+        <v-tab-item
+        >
+        <comments
+          @showLoginDialog="emitShowSignIn()"
+          :comments="comments"
+          :idPaddle="paddle.id"
+          :userIsLoggedIn="userIsLoggedIn"
+          :userId="userId"></comments>
+        </v-tab-item>
+      </v-tabs-items>
 
-    </v-tabs>
-  </v-card>
+      </v-tabs>
+    </v-card>
+  </div>
 </template>
 
 <script>
@@ -85,6 +107,17 @@
     mounted() {
     },
     methods: {
+      async copyURL() {
+        try {
+          await navigator.clipboard.writeText(this.paddleLink);
+          this.urlCopied = true;
+          setTimeout(() => {
+            this.urlCopied = false;
+          },3000)
+        } catch(e) {
+          console.log(e);
+        }
+      },
       emitShowSignIn() {
         this.$emit('showLoginDialog');
       },
@@ -115,6 +148,11 @@
       drivingDirectionsHref() {
         return 'https://www.google.com/maps/dir/?api=1&destination=' + this.paddle.pin[1] + ',' + this.paddle.pin[0];
       },
+      paddleLink() {
+        let location = window.location;
+        console.log(location); 
+        return location.protocol + '//' + location.host + location.pathname + '?route=' + this.paddle.urlName;
+      }
     },
     data: () => ({
       tab: null,
@@ -122,7 +160,9 @@
         // { text:'The paddle was quite overgrown and hurt my arm.' , user:'Emilie', date:'06/27/1989'},
         // { text:'The paddle was quite overgrown and hurt my arm.' , user:'Emilie', date:'06/27/1989'},
         // { text:'The paddle was quite overgrown and hurt my arm.' , user:'Emilie', date:'06/27/1989'}
-      ]
+      ],
+      showShareLink:false,
+      urlCopied: false
     }),
   }
 </script>
@@ -198,6 +238,25 @@
   }
   .info-block {
 
+  }
+  .share-link-content {
+    font-size:14px;
+    padding:15px;
+    div {
+      display:flex;
+      background-color:#f0f0f0;
+      padding:7px;
+      margin-top:5px;
+      margin-right:20px;
+      .v-icon {
+        transform: rotate(90deg);
+        font-size: 20px;
+        cursor:pointer;
+      }
+      .v-icon.mdi-check {
+        transform:none;
+      }
+    }
   }
   // .comment-login-message {
   //   font-size: 0.85rem;

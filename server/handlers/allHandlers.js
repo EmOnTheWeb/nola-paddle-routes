@@ -239,7 +239,8 @@ async function getRouteNamesAndStartCoordinates(req,res) {
           'route':doc.route,
           'tags':doc.tags,
           'description':doc.description,
-          'uid':doc.uid || '' //the user that originally uploaded the paddle
+          'uid':doc.uid || '', //the user that originally uploaded the paddle
+          'urlName':doc.urlName
         }
 
       if (doc.multi) {
@@ -367,8 +368,11 @@ function addPaddle(req,res,next) {
 
     let name = fields.name[0].toUpperCase() + fields.name.substring(1);
 
+    let urlName = fields.name.toLowerCase().replace(/ /g,'-');
+
     let newPaddleObj = {
       name: name,
+      urlName: urlName,
       distance: fields.distance,
       launchType: fields.boatLaunchType,
       tags: tags,
