@@ -1,6 +1,22 @@
 <template>
   <div>
     <v-overlay :value="overlay"></v-overlay>
+    <v-dialog v-model="showHelpDialog" max-width="600" :hide-overlay="true">
+      <v-card class="help-dialog">
+        <v-icon color="accent" class="icon--close" @click="showHelpDialog = false">mdi-close</v-icon>
+        <p>Welcome to Kayak New Orleans. This website showcases paddle routes around New Orleans, in Louisiana and Mississippi.
+
+        <p>You can export and comment on existing routes as well as upload your own for others to follow.</p>
+
+        <p>Color differentiates paddles by distance:</p>
+          <p><span style="color:#33c377;font-weight:bold;">Green</span> - less than 6miles</p>
+          <p><span style="color:#f69640;font-weight:bold;">Orange</span> - between 6 and 11 miles</p>
+          <p><span style="color:#f84d4d;font-weight:bold;">Red</span> - more than 11 miles</p>
+          <p>Please note distance is not necessarily indicative of difficulty, which can depend more on conditions.</p>
+        <p>To request features / report bugs, please email
+          <a href = "mailto: kayakneworleans@gmail.com">kayakneworleans@gmail.com</a> </p>
+      </v-card>
+    </v-dialog>
     <v-dialog v-if="showIndividualView" v-model="showIndividualView" max-width="600" :hide-overlay="true">
       <individual-view
         :userIsLoggedIn="userData.isLoggedIn"
@@ -140,6 +156,13 @@
             </section>
             <v-btn v-if="this.type.length !==0  || this.select" @click="clearFilters()" text-color="primary" small depressed color="transparent">clear</v-btn>
             <div class="login-btns" v-show="userDataLoaded">
+              <v-icon
+                dark
+                color="accent"
+                @click="showHelpDialog = true"
+                >
+                mdi-help-circle-outline
+              </v-icon>
               <v-btn v-if="!userData.isLoggedIn" @click="showLoginDialog = true" small depressed color="accent">Sign In</v-btn>
               <v-menu bottom offset-y open-on-hover>
                 <template v-slot:activator="{ on, attrs }">
@@ -359,12 +382,19 @@
                     @click="hideAllRoutes()"
                   ></v-checkbox>
                   <h4 style="font-weight:500;">Paddles</h4>
-                  <v-icon
-                    class="upload-btn"
-                    color="primary"
-                    @click="showPaddleUploadDialog()">
-                    mdi-upload
-                  </v-icon>
+                  <v-tooltip bottom>
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-icon
+                        v-bind="attrs"
+                        v-on="on"
+                        class="upload-btn"
+                        color="primary"
+                        @click="showPaddleUploadDialog()">
+                        mdi-upload
+                      </v-icon>
+                    </template>
+                    <span>Upload New</span>
+                  </v-tooltip>
                 </v-list-item>
                 <v-list-item
                   v-for="(paddle, index) in filteredPaddles"
@@ -502,9 +532,13 @@
       checkForRouteParam() {
         let routeParam = this.$route.query.route;
         if (routeParam) {
-          let paddle = this.paddles.find((p) => p.urlName == routeParam);
-          this.mainMap.flyToFitRouteBounds(paddle);
-          this.togglePaddleRoute(paddle,true); 
+          let paddle = this.paddles.find((p) => {
+            return p.urlName == routeParam
+          });
+          if (paddle) {
+            this.mainMap.flyToFitRouteBounds(paddle);
+            this.togglePaddleRoute(paddle,true);
+          }
         }
       },
       clearFilters() {
@@ -805,7 +839,8 @@
       showPaddleUpload: false,
       overlay: false,
       mobileDrawer: false,
-      mapIsInitialized: false
+      mapIsInitialized: false,
+      showHelpDialog: false
     }),
     watch: {
       paddles(newVal,oldVal) {
@@ -996,9 +1031,13 @@
     background-image: url('../assets/marker-icon-orange.png');
   }
   .login-btns {
+    display:flex;
     cursor:pointer;
     border-left:1px solid var(--v-primary-lighten5);
     padding:0px 10px;
+    .mdi-help-circle-outline {
+      margin-right:10px;
+    }
   }
   ::v-deep .mdi-menu-down.v-icon.theme--light   {
     color:var(--v-accent-base);
@@ -1036,5 +1075,17 @@
   }
   .v-navigation-drawer--is-mobile {
     z-index: 8;
+  }
+  .help-dialog {
+    padding:30px;
+    p {
+      margin-bottom:10px;
+    }
+  }
+  .v-card .icon--close {
+    position: absolute;
+    right: 10px;
+    top: 12px;
+    cursor:pointer;
   }
 </style>

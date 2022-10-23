@@ -369,6 +369,8 @@ function addPaddle(req,res,next) {
     let name = fields.name[0].toUpperCase() + fields.name.substring(1);
 
     let urlName = fields.name.toLowerCase().replace(/ /g,'-');
+    urlName = urlName.replace(/?/g,'-');
+    urlName = urlName.replace(/[&?]/g,'-'); 
 
     let newPaddleObj = {
       name: name,

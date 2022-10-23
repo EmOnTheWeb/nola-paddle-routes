@@ -105,6 +105,7 @@
       userId: String
     },
     mounted() {
+
     },
     methods: {
       async copyURL() {
@@ -150,7 +151,6 @@
       },
       paddleLink() {
         let location = window.location;
-        console.log(location); 
         return location.protocol + '//' + location.host + location.pathname + '?route=' + this.paddle.urlName;
       }
     },
