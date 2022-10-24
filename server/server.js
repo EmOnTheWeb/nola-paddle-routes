@@ -34,19 +34,10 @@ app.use(sessions(
   }
 ));
 
-const whitelist = ['http://localhost:8080', 'https://nola-paddle-trails.netlify.app', 'https://kayakneworleans.com']
-
 const corsOpts = {
   credentials: true,
-  origin: function (origin, callback) {
-    if (whitelist.indexOf(origin) !== -1) {
-      callback(null, true)
-    } else {
-      callback(new Error('Not allowed by CORS'))
-    }
-  }
+  origin: process.env.ORIGIN
 }
-
 app.use(cors(corsOpts));
 app.use(express.json());
 app.use(require('./routes/routes.js'));
