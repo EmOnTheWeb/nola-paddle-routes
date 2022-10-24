@@ -38,7 +38,13 @@ const whitelist = ['http://localhost:8080', 'https://nola-paddle-trails.netlify.
 
 const corsOpts = {
   credentials: true,
-  origin: whitelist
+  origin: function (origin, callback) {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  }
 }
 
 app.use(cors(corsOpts));
