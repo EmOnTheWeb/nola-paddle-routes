@@ -4,15 +4,15 @@
     <v-dialog v-model="showHelpDialog" max-width="600" :hide-overlay="true">
       <v-card class="help-dialog">
         <v-icon color="accent" class="icon--close" @click="showHelpDialog = false">mdi-close</v-icon>
-        <p>Welcome to Kayak New Orleans. This website showcases paddle routes around New Orleans, in Louisiana and Mississippi.
+        <p>Welcome to Kayak New Orleans. This website shows paddle routes in Louisiana and Mississippi.
 
         <p>You can export and comment on existing routes as well as upload your own for others to follow.</p>
 
         <p>Color differentiates paddles by distance:</p>
-          <p><span style="color:#33c377;font-weight:bold;">Green</span> - less than 6miles</p>
+          <p><span style="color:#33c377;font-weight:bold;">Green</span> - less than 6 miles</p>
           <p><span style="color:#f69640;font-weight:bold;">Orange</span> - between 6 and 11 miles</p>
           <p><span style="color:#f84d4d;font-weight:bold;">Red</span> - more than 11 miles</p>
-          <p>Please note distance is not necessarily indicative of difficulty, which can depend more on conditions.</p>
+          <p>Note distance is not necessarily indicative of difficulty. Conditions are very important, especially in open water.</p>
         <p>To request features / report bugs, please email
           <a href = "mailto: kayakneworleans@gmail.com">kayakneworleans@gmail.com</a> </p>
       </v-card>
