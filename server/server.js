@@ -34,7 +34,7 @@ app.use(sessions(
   }
 ));
 
-const whitelist = ['http://localhost:8080', 'https://nola-paddle-trails.netlify.app', 'https://kayakneworleans.com']
+const whitelist = ['http://localhost:8080', 'https://nola-paddle-trails.netlify.app', 'https://kayakneworleans.com', 'https://www.kayakneworleans.com/']; 
 
 const corsOpts = {
   credentials: true,
