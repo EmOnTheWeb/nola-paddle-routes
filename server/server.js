@@ -30,11 +30,14 @@ app.use(sessions(
     store: store,
     saveUninitialized: false,
     resave: false,
-    cookie: { secure: false }
+    cookie: {
+      sameSite: "none",
+      secure: true
+    }
   }
 ));
 
-const whitelist = ['http://localhost:8080', 'https://nola-paddle-trails.netlify.app', 'https://www.kayakneworleans.com'];
+const whitelist = ['http://localhost:8080', 'https://nola-paddle-trails.netlify.app', 'https://www.kayakneworleans.com', 'https://www.kayakneworleans.com/'];
 
 const corsOpts = {
   credentials: true,
