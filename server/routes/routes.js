@@ -20,6 +20,6 @@ routes.route('/comment').put(handlers.deleteComment);
 
 routes.route('/comment').get(handlers.getComments);
 
-routes.route('/uploadPaddle').post(handlers.addPaddle);
+routes.route('/upload').post(handlers.addPaddle);
 
 module.exports = routes;

@@ -132,7 +132,7 @@
           fileTwo: this.fileTwo
         }
 
-        NODE_API.post('/uploadPaddle', formData, {
+        NODE_API.post('/upload', formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
