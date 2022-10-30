@@ -24,6 +24,8 @@ store.on('error', function(error) {
   console.log(error);
 });
 
+app.set('trust proxy', 1); 
+
 app.use(sessions(
   {
     secret: process.env.COOKIE_SECRET,
@@ -31,8 +33,10 @@ app.use(sessions(
     saveUninitialized: false,
     resave: false,
     cookie: {
-      sameSite: "none",
-      secure: true
+      httpOnly: true,
+      secure: true,
+      maxAge: 1000 * 60 * 60 * 48,
+      sameSite: 'none'
     }
   }
 ));
