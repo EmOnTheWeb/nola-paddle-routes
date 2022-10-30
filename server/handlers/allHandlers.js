@@ -319,7 +319,7 @@ function importRawData(req,res) {
 
 function uploadFileAndExtractRouteCoordinates(tempFilePath,destFilePath) {
   return new Promise ((resolve,reject) => {
-    fs.rename(tempFilePath, destFilePath, async (err) => {
+    fs.copyFile(tempFilePath, destFilePath, async (err) => {
 
       if (err) throw err;
 
