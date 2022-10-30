@@ -50,7 +50,6 @@
 
           <v-btn
            class="mb-1"
-           :disabled="!valid"
            color="accent"
            block
            @click="validateAndSubmitSignin()"

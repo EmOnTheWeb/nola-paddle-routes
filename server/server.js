@@ -24,22 +24,24 @@ store.on('error', function(error) {
   console.log(error);
 });
 
-app.set('trust proxy', 1); 
-
-app.use(sessions(
-  {
+let sess = {
     secret: process.env.COOKIE_SECRET,
     store: store,
     saveUninitialized: false,
     resave: false,
     cookie: {
       httpOnly: true,
-      secure: true,
-      maxAge: 1000 * 60 * 60 * 48,
-      sameSite: 'none'
+      maxAge: 1000 * 60 * 60 * 48
     }
-  }
-));
+  };
+
+if (app.get('env') === 'production') {
+  app.set('trust proxy', 1) // trust first proxy
+  sess.cookie.secure = true // serve secure cookies
+  sess.cookie.sameSite = 'none'; 
+}
+
+app.use(sessions(sess));
 
 const whitelist = ['http://localhost:8080', 'https://nola-paddle-trails.netlify.app', 'https://www.kayakneworleans.com', 'https://www.kayakneworleans.com/'];
 
