@@ -39,6 +39,11 @@
         @setUserData="(data) => setUserData(data)">
       </login>
     </v-dialog>
+    <v-dialog v-model="showMyPaddles" max-width="600" :hide-overlay="true">
+      <my-paddles-view
+      :userId="userData.uid"
+      ></my-paddles-view>
+    </v-dialog>
     <!-- desktop app bar-->
     <v-app-bar
       app
@@ -177,6 +182,9 @@
                   </span>
                 </template>
                 <v-list>
+                  <v-list-item @click="showMyPaddlesView()">
+                    <v-list-item-title>My Paddles</v-list-item-title>
+                  </v-list-item>
                   <v-list-item @click="logout()">
                     <v-list-item-title>Logout</v-list-item-title>
                   </v-list-item>
@@ -481,6 +489,7 @@
   import {MainMap} from '../utils/mainMap';
   import {LouisianaTowns} from '../assets/louisianaTowns.js';
   import IndividualView from '../pages/IndividualView.vue';
+  import MyPaddlesView from '../pages/MyPaddlesView.vue';
   import PaddleUpload from '../pages/PaddleUpload.vue';
   import Login from '../pages/Login.vue';
   import NODE_API from '../utils/api';
@@ -492,7 +501,8 @@
     components: {
       IndividualView,
       Login,
-      PaddleUpload
+      PaddleUpload,
+      MyPaddlesView
     },
     created() {
 
@@ -529,6 +539,9 @@
       }
     },
     methods: {
+      showMyPaddlesView() {
+        this.showMyPaddles = true;
+      },
       checkForRouteParam() {
         let routeParam = this.$route.query.route;
         if (routeParam) {
@@ -840,7 +853,8 @@
       overlay: false,
       mobileDrawer: false,
       mapIsInitialized: false,
-      showHelpDialog: false
+      showHelpDialog: false,
+      showMyPaddles: false,
     }),
     watch: {
       paddles(newVal,oldVal) {
