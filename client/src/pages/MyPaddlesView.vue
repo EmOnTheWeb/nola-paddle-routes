@@ -47,7 +47,7 @@
     },
     created() {
       if (this.userId !== '') {
-        NODE_API.get('/getMyPaddles').then(response => {
+        NODE_API.get(`/paddles/${this.userId}`).then(response => {
           this.myPaddles = response.data;
           this.myPaddlesLoaded = true;
         })
@@ -91,12 +91,12 @@
   }
   ::v-deep .name-col, ::v-deep .dtuploaded-col {
     span {
-      font-size:0.8rem!important;
+      font-size:0.85rem!important;
       color:var(--v-primary-base)!important;
     }
   }
   ::v-deep td {
-    font-size:0.8rem!important;
+    font-size:0.85rem!important;
     font-weight:500;
     color:var(--v-primary-lighten1);
   }

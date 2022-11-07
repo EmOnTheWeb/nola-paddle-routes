@@ -198,8 +198,14 @@ async function addUser(req,res) {
 
 async function getRouteNamesAndStartCoordinates(req,res) {
   const db = dbo.getDb();
+
+  let clause = {};
+  if (req.params && req.params.userId) {
+    clause = { uid: req.params.userId };
+  }
+
   const paddlesCollection = db.collection('paddles');
-  let array = await paddlesCollection.find({}).sort({'name':1}).toArray();
+  let array = await paddlesCollection.find(clause).sort({'name':1}).toArray();
 
   let childRoutes = array.filter((d) => d.multi && d.idParent)
                          .map((d) => {
