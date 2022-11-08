@@ -236,6 +236,14 @@ async function getRouteNamesAndStartCoordinates(req,res) {
       //these are in the childRoutes array
     } else {
       let startCoord = doc.route[0];
+
+      let date = new Date(doc.dttimestamp);
+      let year = date.getFullYear();
+      let month = date.getMonth()+1;
+      let dt = date.getDate();
+
+      let dtUploaded = `${month}/${dt}/${year}`;
+
       let coordObj = {
           'id':doc._id.toString(),
           'name':doc.name,
@@ -246,7 +254,8 @@ async function getRouteNamesAndStartCoordinates(req,res) {
           'tags':doc.tags,
           'description':doc.description,
           'uid':doc.uid || '', //the user that originally uploaded the paddle
-          'urlName':doc.urlName
+          'urlName':doc.urlName,
+          'dtUploaded':dtUploaded
         }
 
       if (doc.multi) {
