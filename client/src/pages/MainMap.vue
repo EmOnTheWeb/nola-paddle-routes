@@ -27,11 +27,11 @@
       ></individual-view>
     </v-dialog>
     <v-dialog v-if="showPaddleUpload" v-model="showPaddleUpload" max-width="350" :hide-overlay="true">
-      <paddle-upload
+      <add-edit-paddle
         :userIsLoggedIn="userData.isLoggedIn"
         :userId="userData.uid"
         @close="showPaddleUpload = false"
-      ></paddle-upload>
+      ></add-edit-paddle>
     </v-dialog>
     <v-dialog eager v-model="showLoginDialog" max-width="350" :hide-overlay="false">
       <login
@@ -490,7 +490,7 @@
   import {LouisianaTowns} from '../assets/louisianaTowns.js';
   import IndividualView from '../pages/IndividualView.vue';
   import MyPaddlesView from '../pages/MyPaddlesView.vue';
-  import PaddleUpload from '../pages/PaddleUpload.vue';
+  import AddEditPaddle from '../pages/AddEditPaddle.vue';
   import Login from '../pages/Login.vue';
   import NODE_API from '../utils/api';
   import Vue from 'vue';
@@ -501,7 +501,7 @@
     components: {
       IndividualView,
       Login,
-      PaddleUpload,
+      AddEditPaddle,
       MyPaddlesView
     },
     created() {

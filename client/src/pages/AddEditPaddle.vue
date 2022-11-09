@@ -104,16 +104,20 @@
   import NODE_API from '../utils/api';
 
   export default {
-    name: 'PaddleUpload',
+    name: 'AddEditPaddle',
     components: {
 
     },
     props: {
       show: Boolean,
       userIsLoggedIn: Boolean,
-      userId: String
+      userId: String,
+      paddle: Object
     },
     mounted() {
+      if (this.paddle) {
+        console.log('there is one',this.paddle); 
+      }
     },
     methods: {
       close() {

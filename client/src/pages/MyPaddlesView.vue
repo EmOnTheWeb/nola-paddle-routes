@@ -1,5 +1,13 @@
 <template>
   <v-container>
+    <v-dialog v-if="showEditPaddle" v-model="showEditPaddle" max-width="350" :hide-overlay="true">
+      <add-edit-paddle
+        :userIsLoggedIn="true"
+        :userId="userId"
+        :paddle="paddleToEdit"
+        @close="showEditPaddle = false"
+      ></add-edit-paddle>
+    </v-dialog>
     <div class="spinner-container"
       v-if="!myPaddlesLoaded">
       <v-progress-circular
@@ -22,7 +30,7 @@
         <div class="edit-paddle">
           <v-icon
             class="mr-2"
-            @click="editPaddle()"
+            @click="editPaddle(item)"
           >
             mdi-pencil
           </v-icon>
@@ -38,11 +46,12 @@
 
 <script>
   import NODE_API from '../utils/api';
+  import AddEditPaddle from '../pages/AddEditPaddle.vue';
 
   export default {
     name: 'MyPaddlesView',
     components: {
-
+      AddEditPaddle
     },
     props: {
       userId: String
@@ -62,9 +71,9 @@
 
     },
     methods: {
-      editPaddle() {
-
-
+      editPaddle(thePaddle) {
+        this.paddleToEdit = thePaddle;
+        this.showEditPaddle = true;
       }
     },
     computed: {
@@ -73,6 +82,7 @@
     data: () => ({
       myPaddles: [],
       myPaddlesLoaded: false,
+      paddleToEdit: {},
       overlay: false,
       headers: [
         {
@@ -82,7 +92,8 @@
         },
         { text: 'Date Uploaded', value: 'dtUploaded', class: 'dtuploaded-col'},
         { text: 'Actions', value: 'actions', sortable: false },
-      ]
+      ],
+      showEditPaddle: false
     }),
   }
 </script>
@@ -104,7 +115,7 @@
   }
   ::v-deep .v-data-table>.v-data-table__wrapper>table>tbody>tr>td {
     height:30px;
-    font-size:0.875; 
+    font-size:0.875;
     .v-icon {
       color: var(--v-primary-lighten1);
     }
