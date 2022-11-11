@@ -6,7 +6,7 @@ const cors = require('cors');
 const dbo = require('./db/conn');
 const sessions = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(sessions);
-const uri = `mongodb+srv://${process.env.DB_NAME}:${process.env.DB_PASSWORD}@cluster0.o3atuqr.mongodb.net/?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${process.env.DB_USER_NAME}:${process.env.DB_USER_PASSWORD}@cluster0.o3atuqr.mongodb.net/?retryWrites=true&w=majority`;
 
 const PORT = process.env.PORT || 5000;
 const app = express();
@@ -14,7 +14,7 @@ const app = express();
 const store = new MongoDBStore(
   {
     uri: uri,
-    databaseName: 'PaddleRoutes',
+    databaseName: process.env.DB_NAME,
     collection: 'sessions'
   }
 );
@@ -38,7 +38,7 @@ let sess = {
 if (app.get('env') === 'production') {
   app.set('trust proxy', 1) // trust first proxy
   sess.cookie.secure = true // serve secure cookies
-  sess.cookie.sameSite = 'none'; 
+  sess.cookie.sameSite = 'none';
 }
 
 app.use(sessions(sess));
