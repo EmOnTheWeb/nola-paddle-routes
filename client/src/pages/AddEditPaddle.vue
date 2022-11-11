@@ -5,29 +5,32 @@
     <v-card-title v-if="isEdit">Edit Paddle</v-card-title>
     <v-icon color="accent" class="icon--close" @click="close()">mdi-close</v-icon>
     <v-card-text>
-      <v-form v-model="valid" ref="paddleUploadForm">
+      <v-form ref="paddleAddEditForm">
         <v-text-field
           class="mb-4"
           v-model="name"
           label="Name"
+          :rules="nameRules"
           required
           filled
           outlined
           dense
-          hide-details
+          validate-on-blur
         />
         <v-text-field
           class="text-field--small mb-4"
           v-model="distance"
           label="Distance"
+          :rules="distanceRules"
           filled
           outlined
           single-line
           dense
           required
-          hide-details
           type="number"
           suffix="miles"
+          validate-on-blur
+          min="1"
         />
         <v-text-field
           v-model="boatLaunchType"
@@ -62,9 +65,11 @@
         />
         <template v-if="!isEdit">
           <v-file-input
+            style="margin-top:14px;"
             label="Route"
             chips
             v-model="fileOne"
+            :rules="fileOneRules"
             small-chips
             hint="Upload route gpx or kml file."
             filled
@@ -72,18 +77,22 @@
             outlined
             persistent-hint
             dense
+            validate-on-blur
             accept=".gpx,.kml"
           ></v-file-input>
           <v-file-input
+            style="margin-top:14px;"
             label="Route"
             chips
             v-model="fileTwo"
+            :rules="fileTwoRules"
             small-chips
             hint="If there is a second file for this route upload it here."
             filled
             outlined
             persistent-hint
             dense
+            validate-on-blur
             accept=".gpx,.kml"
           ></v-file-input>
         </template>
@@ -109,6 +118,7 @@
                 ></v-file-input>
                 <v-file-input
                   label="Route"
+                  style="margin-top:14px;"
                   chips
                   v-model="fileTwo"
                   small-chips
@@ -124,7 +134,7 @@
           </v-expansion-panels>
         </template>
         <v-btn
-         class="mt-3"
+         class="mt-6"
          color="accent"
          block
          @click="submitPaddle()"
@@ -168,7 +178,18 @@
       close() {
         this.$emit('close',true);
       },
+      checkFormIsValid() {
+        
+          let isValid = this.$refs.paddleAddEditForm.validate();
+          return isValid; 
+      },
       submitPaddle() {
+        let isValid = this.checkFormIsValid(); 
+      
+        if (!isValid) {
+          return; 
+        }
+        
         this.overlay = true;
 
         let formData = {
@@ -213,7 +234,9 @@
       }
     },
     computed: {
-
+      fileTwoRules() {
+        return [() => (this.fileOne) || 'Upload to file one first']; 
+      },
     },
     data: () => ({
       name: '',
@@ -222,11 +245,19 @@
       tags: '',
       type: '',
       types: ['Bayou','River','Open Water'],
-      valid: false,
       fileOne: null,
       fileTwo: null,
       overlay: false,
-      isEdit: false 
+      isEdit: false,
+      nameRules: [
+        v => !!v || "Name is required"
+      ],
+      distanceRules: [
+        v => !!v || "Distance is required"
+      ],
+      fileOneRules: [
+        v => !!v || 'Route is required',
+      ]
     }),
   }
 </script>
@@ -250,5 +281,31 @@
   .v-expansion-panel-header, ::v-deep .v-expansion-panel-content .v-expansion-panel-content__wrap {
     padding:0px; 
     min-height:30px; 
+  }
+  ::v-deep .v-text-field__details {
+    display:none;
+  }
+
+  ::v-deep .v-input.error--text {
+    margin-bottom:0px!important;
+    .v-text-field__details{
+      margin-top:1px;
+      display:block;
+      padding:0px;
+    }
+  }
+
+  ::v-deep .v-file-input.error--text + .v-file-input
+   {
+    margin-top:0px!important;
+  }
+  ::v-deep .v-input__slot {
+    margin-bottom:0px!important; 
+  }
+  .v-expansion-panel-header {
+    margin-top:10px; 
+    &.v-expansion-panel-header--active {
+      margin-top:0px; 
+    }
   }
 </style>
