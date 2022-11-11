@@ -242,8 +242,10 @@ async function getRouteNamesAndStartCoordinates(req,res) {
       let year = date.getFullYear();
       let month = date.getMonth()+1;
       let dt = date.getDate();
+      
+      let time = date.toLocaleTimeString('en-US')
 
-      let dtUploaded = `${month}/${dt}/${year}`;
+      let dtUploaded = `${month}/${dt}/${year} ${time}`;
 
       let coordObj = {
           'id':doc._id.toString(),
@@ -372,9 +374,14 @@ function editPaddle(req,res,next) {
       next(err);
       return;
     }
-
-    let tags = [fields.type].concat(fields.tags.split(','));
-
+    let tags = []; 
+    if (fields.tags.length) {
+      tags = fields.tags.split(','); 
+    }
+    if (fields.type) {
+      tags.unshift(fields.type); 
+    }
+    
     let name = fields.name[0].toUpperCase() + fields.name.substring(1);
 
     let urlName = fields.name.toLowerCase().replace(/ /g,'-');
@@ -463,7 +470,14 @@ function addPaddle(req,res,next) {
 
     let theCoords = await uploadFileAndExtractRouteCoordinates(tempFilePath, destFilePath);
 
-    let tags = [fields.type].concat(fields.tags.split(','));
+    let tags = []; 
+    if (fields.tags.length) {
+      tags = fields.tags.split(','); 
+    }
+  
+    if (fields.type) {
+      tags.unshift(fields.type); 
+    }
 
     let name = fields.name[0].toUpperCase() + fields.name.substring(1);
 
