@@ -27,10 +27,9 @@
         <v-spacer></v-spacer>
       </template>
       <template v-slot:item.actions="{ item }">
-        <div class="edit-paddle">
+        <div class="edit-paddle" @click="editPaddle(item)">
           <v-icon
             class="mr-2"
-            @click="editPaddle(item)"
           >
             mdi-pencil
           </v-icon>
@@ -134,7 +133,6 @@
     display:flex;
     justify-content:center;
     align-items:center;
-    min-height:200px;
   }
 
 </style>
