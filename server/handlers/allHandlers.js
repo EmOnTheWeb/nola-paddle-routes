@@ -5,6 +5,7 @@ DOMParser = require('xmldom').DOMParser;
 const formidable = require('formidable');
 const bcrypt = require('bcryptjs');
 const saltRounds = 10;
+const ObjectID = require('mongodb').ObjectID;
 
 async function deleteComment(req,res) {
 
@@ -218,7 +219,7 @@ async function getRouteNamesAndStartCoordinates(req,res) {
                                 };
                             return childDocToObj;
                          });
-
+                  
    function findAndConcatChildRoute(topLevelRouteObj, parent = null) {
      let child = childRoutes.find((doc) => doc.idParent == parent.id.toString());
      if (!child) {
@@ -362,6 +363,89 @@ function uploadFileAndExtractRouteCoordinates(tempFilePath,destFilePath) {
   });
 }
 
+function editPaddle(req,res,next) {
+
+  const form = formidable({});
+
+  form.parse(req, async (err, fields, files) => {
+    if (err) {
+      next(err);
+      return;
+    }
+
+    let tags = [fields.type].concat(fields.tags.split(','));
+
+    let name = fields.name[0].toUpperCase() + fields.name.substring(1);
+
+    let urlName = fields.name.toLowerCase().replace(/ /g,'-');
+
+    urlName = urlName.replace(/[&?]/g,'-');
+
+    const db = dbo.getDb();
+    const paddlesCollection = db.collection('paddles');
+    
+    await paddlesCollection.updateOne(
+       { _id: ObjectID(fields.idPaddle) },
+       {
+         $set: {
+           name: name,
+           urlName: urlName,
+           distance: fields.distance, 
+           launchType: fields.boatLaunchType, 
+           tags: tags, 
+           dttimestamp: new Date() 
+         }
+       }
+    ); 
+    
+    if (files.fileOne) {
+      let tempFilePath = files.fileOne.filepath;
+      const destFilePath = process.cwd()+ '/rawData' + '/' + files.fileOne.originalFilename;
+      //add the file to the folder on the server
+      let theCoords = await uploadFileAndExtractRouteCoordinates(tempFilePath, destFilePath);  
+      
+      await paddlesCollection.updateOne(
+         { _id: ObjectID(fields.idPaddle) },
+         {
+           $set: {
+             route: theCoords,
+           }
+         }
+      ); 
+      
+      if (files.fileTwo) {
+        //remove any documents corresponding to second part of old route 
+        await paddlesCollection.remove({idParent:fields.idPaddle});
+      
+        let tempFilePathTwo = files.fileTwo.filepath;
+        const destFilePathTwo = process.cwd()+ '/rawData' + '/' + files.fileTwo.originalFilename;      
+        let theCoordsTwo = await uploadFileAndExtractRouteCoordinates(tempFilePathTwo, destFilePathTwo);
+
+        let childPaddleObj = {
+           multi:true,
+           idParent: fields.idPaddle,
+           route: theCoordsTwo,
+           uid: req.session.uid,
+           dttimestamp: new Date()
+         }
+    
+         let newlyAddedSecondPart = await paddlesCollection.insertOne(
+           childPaddleObj
+         );  
+         //set multi:true on parent object 
+         await paddlesCollection.updateOne(
+            { _id: ObjectID(fields.idPaddle) },
+            {
+              $set: {
+                multi: true
+              }
+            }
+         );   
+       }      
+    }
+    res.send({success:true});
+  });
+}
 
 function addPaddle(req,res,next) {
 
@@ -447,3 +531,4 @@ module.exports.addComment = addComment;
 module.exports.getComments = getComments;
 module.exports.deleteComment = deleteComment;
 module.exports.addPaddle = addPaddle;
+module.exports.editPaddle = editPaddle; 

@@ -22,6 +22,8 @@ routes.route('/comment').get(handlers.getComments);
 
 routes.route('/paddles').post(handlers.addPaddle);
 
+routes.route('/paddles').put(handlers.editPaddle);
+
 routes.route('/paddles/:userId').get(handlers.getRouteNamesAndStartCoordinates);
 
 // routes.route('/paddles').put(handlers.updatePaddle);
