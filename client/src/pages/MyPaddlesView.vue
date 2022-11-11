@@ -15,6 +15,7 @@
          color="accent"
       ></v-progress-circular>
     </div>
+    <v-icon color="accent" class="icon--close" @click="close()">mdi-close</v-icon>
     <v-data-table
       v-if="myPaddlesLoaded"
       :headers="headers"
@@ -70,6 +71,9 @@
 
     },
     methods: {
+      close() {
+        this.$emit('close',true);
+      },
       editPaddle(thePaddle) {
         this.paddleToEdit = thePaddle;
         this.showEditPaddle = true;
@@ -100,6 +104,7 @@
 <style lang="scss" scoped>
   .container {
     background-color:white;
+    position:relative; 
   }
   .v-data-table h2{
     font-size:1rem;
@@ -133,6 +138,12 @@
     display:flex;
     justify-content:center;
     align-items:center;
+  }
+  .v-icon.icon--close {
+    position: absolute;
+    right: 10px;
+    top: 12px;
+    cursor:pointer;
   }
 
 </style>

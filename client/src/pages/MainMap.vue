@@ -42,6 +42,7 @@
     <v-dialog v-model="showMyPaddles" max-width="600" :hide-overlay="true">
       <my-paddles-view
       :userId="userData.uid"
+      @close="showMyPaddles = false"
       ></my-paddles-view>
     </v-dialog>
     <!-- desktop app bar-->
@@ -181,7 +182,7 @@
                     <span class="account-text">{{userData.username}}</span>
                   </span>
                 </template>
-                <v-list>
+                <v-list class="user-options">
                   <v-list-item @click="showMyPaddlesView()">
                     <v-list-item-title>My Paddles</v-list-item-title>
                   </v-list-item>
@@ -1101,5 +1102,8 @@
     right: 10px;
     top: 12px;
     cursor:pointer;
+  }
+  .user-options .v-list-item {
+    padding-top:2.5px; padding-bottom:2.5px;
   }
 </style>

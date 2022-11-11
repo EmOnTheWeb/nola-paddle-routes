@@ -100,7 +100,7 @@
           <v-expansion-panels flat>
             <v-expansion-panel>
               <v-expansion-panel-header><div>Edit Route</div>
-                <span class="v-label theme--light v-messages" style="line-height: 20px;">Upload files to overwrite the route</span>
+                <span class="v-label theme--light v-messages" style="line-height: 20px;">Upload files to overwrite route</span>
               </v-expansion-panel-header>
               <v-expansion-panel-content>
                 <v-file-input
