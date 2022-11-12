@@ -36,7 +36,8 @@
     <v-dialog eager v-model="showLoginDialog" max-width="350" :hide-overlay="false">
       <login
         @close="(data) => handleLoginDialogClose(data)"
-        @setUserData="(data) => setUserData(data)">
+        @setUserData="(data) => setUserData(data)"
+        :loginFormIsShowing="showLoginDialog">
       </login>
     </v-dialog>
     <v-dialog v-model="showMyPaddles" max-width="600" :hide-overlay="true">

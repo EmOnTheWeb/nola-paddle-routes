@@ -163,7 +163,7 @@
   export default {
     name: 'Login',
     props: {
-      show: Boolean
+      loginFormIsShowing: Boolean
     },
     mounted() {
       // google.accounts.id.initialize({
@@ -177,9 +177,23 @@
       // google.accounts.id.renderButton(
       //   document.getElementById("g-btn-div2"),
       //   { theme: "outline", text: "signup_with"}  // customization attributes
-      // );
+      // );    
+      window.addEventListener('keyup', this.submitForm); 
     },
     methods: {
+      submitForm(e) {
+        if (!this.loginFormIsShowing || this.showSignUpSuccessMessage) {
+          return; 
+        }
+        if(e.keyCode === 13) {
+          if (this.showSignUp) {
+            this.validateAndSubmitSignup(); 
+          }
+          if (!this.showSignUp) {
+            this.validateAndSubmitSignin(); 
+          }
+        }
+      },
       handleCredentialResponse(response) {
         console.log("Encoded JWT ID token: " + response.credential);
       },
