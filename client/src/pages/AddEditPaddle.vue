@@ -276,14 +276,16 @@
     font-size:12px;
   }
   ::v-deep .v-text-field.v-text-field--enclosed .v-text-field__details {
-    margin-bottom:5px;
+    margin-bottom:0px;
+    min-height:0px;
+    padding:0px; 
+    .v-messages {
+      min-height:0px; 
+    }
   }
   .v-expansion-panel-header, ::v-deep .v-expansion-panel-content .v-expansion-panel-content__wrap {
     padding:0px; 
     min-height:30px; 
-  }
-  ::v-deep .v-text-field__details {
-    display:none;
   }
 
   ::v-deep .v-input.error--text {
