@@ -397,6 +397,7 @@ function editPaddle(req,res,next) {
          $set: {
            name: name,
            urlName: urlName,
+           description: fields.description, 
            distance: fields.distance, 
            launchType: fields.boatLaunchType, 
            tags: tags, 
@@ -489,6 +490,7 @@ function addPaddle(req,res,next) {
       name: name,
       urlName: urlName,
       distance: fields.distance,
+      description: fields.description, 
       launchType: fields.boatLaunchType,
       tags: tags,
       route: theCoords,

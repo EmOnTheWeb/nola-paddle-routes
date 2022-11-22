@@ -17,6 +17,17 @@
           dense
           validate-on-blur
         />
+        <v-textarea
+          v-model="description"
+          filled
+          class="mb-4"
+          outlined
+          rows="4"
+          row-height="10"
+          :rules="descriptionRules"
+          required
+          label="Description"
+        ></v-textarea>
         <v-text-field
           class="text-field--small mb-4"
           v-model="distance"
@@ -169,6 +180,7 @@
         this.name = this.paddle.name; 
         this.distance = this.paddle.distance; 
         this.boatLaunchType = this.paddle.launchType; 
+        this.description = this.paddle.description; 
         let theTypes = this.paddle.tags.filter((t) => this.types.indexOf(t) > -1); 
         this.type = theTypes[0]; 
         this.tags = this.paddle.tags.filter((t) => this.types.indexOf(t) == -1).join(','); 
@@ -194,6 +206,7 @@
 
         let formData = {
           name: this.name,
+          description: this.description,
           distance: this.distance,
           boatLaunchType: this.boatLaunchType,
           type: this.type,
@@ -251,6 +264,9 @@
       isEdit: false,
       nameRules: [
         v => !!v || "Name is required"
+      ],
+      descriptionRules: [
+        v => !!v || "Please enter a description"
       ],
       distanceRules: [
         v => !!v || "Distance is required"
