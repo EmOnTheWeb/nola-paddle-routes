@@ -28,7 +28,7 @@
         <p><span style="font-weight:bold;margin-right:5px;">Distance:</span>{{paddle.distance}}&nbsp;miles</p>
         <p><span style="font-weight:bold;margin-right:5px;">Boat Launch Type:</span>{{paddle.launchType}}</p>
 
-        <p>{{paddle.description}}</p>
+        <p v-html="paddle.description" v-linkified></p>
 
         <div class="tags">
           <v-chip

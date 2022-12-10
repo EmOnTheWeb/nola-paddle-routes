@@ -5,6 +5,7 @@ import IndividualView from './pages/IndividualView.vue'
 import VueRouter from 'vue-router'
 import vuetify from './plugins/vuetify'
 import 'vuetify/dist/vuetify.min.css'
+import linkify from 'vue-linkify'; 
 
 Vue.config.productionTip = false
 
@@ -19,6 +20,8 @@ const router = new VueRouter({
 });
 
 Vue.use(VueRouter);
+
+Vue.directive('linkified', linkify);
 
 new Vue({
   vuetify,

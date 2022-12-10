@@ -20,7 +20,7 @@
           :key="index"
         >
           <v-list-item-content>
-            <v-list-item-content>
+            <v-list-item-content v-linkified>
               {{comment.comment}}
             </v-list-item-content>
             <v-list-item-subtitle>
